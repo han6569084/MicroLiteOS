@@ -1,0 +1,8 @@
+device STM32F407ZG
+if SWD
+speed 4000
+r
+loadbin build/out/STM32F407_Project.bin, 0x08000000
+r
+g
+exit

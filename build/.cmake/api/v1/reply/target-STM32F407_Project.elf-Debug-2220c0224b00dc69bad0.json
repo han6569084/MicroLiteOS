@@ -1,0 +1,295 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "STM32F407_Project.elf"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"add_compile_definitions",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 54,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 52,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 45,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -g"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 2,
+					"define" : "STM32F40_41xxx"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "USE_STDPERIPH_DRIVER"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/Application"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/Drive/Include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/STM32/CMSIS/Include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/STM32/CMSIS/Device/ST/STM32F4xx/Include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/STM32/STM32F4xx_StdPeriph_Driver/inc"
+				}
+			],
+			"language" : "ASM",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Wall -O2 -g -g"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 2,
+					"define" : "STM32F40_41xxx"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "USE_STDPERIPH_DRIVER"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/Application"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/Drive/Include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/STM32/CMSIS/Include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/STM32/CMSIS/Device/ST/STM32F4xx/Include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/home/hanzj/workspace/stm32/STM32/STM32F4xx_StdPeriph_Driver/inc"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13
+			]
+		}
+	],
+	"id" : "STM32F407_Project.elf::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Wall -O2 -g -g",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -Wl,--gc-sections -T/home/hanzj/workspace/stm32/linker/STM32F407VG_FLASH.ld -Wl,-Map=STM32F407_Project.map",
+				"role" : "flags"
+			}
+		],
+		"language" : "C"
+	},
+	"name" : "STM32F407_Project.elf",
+	"nameOnDisk" : "STM32F407_Project.elf",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "startup/startup_stm32f407xx.s",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Application/main.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Application/stm32f4xx_it.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Application/syscalls.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Drive/Source/delay.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Drive/Source/key.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Drive/Source/led.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "Drive/Source/usart.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "STM32/CMSIS/Device/ST/STM32F4xx/Source/Templates/system_stm32f4xx.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "STM32/STM32F4xx_StdPeriph_Driver/src/misc.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dma.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.c",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "EXECUTABLE"
+}

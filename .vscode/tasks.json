@@ -1,0 +1,56 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start JLink GDB Server",
+      "type": "shell",
+      "command": "/mnt/c/Program Files/SEGGER/JLink/JLinkGDBServerCL.exe",
+      "args": [
+        "-device", "STM32F407ZG",
+        "-if", "SWD",
+        "-speed", "4000",
+        "-port", "2331"
+      ],
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated"
+      }
+    },
+    {
+        "label": "Build Project",
+        "type": "shell",
+        "command": "${workspaceFolder}/remake.sh",
+        "args": [],
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "problemMatcher": ["$gcc"],
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared"
+        }
+    },
+    {
+        "label": "Flash with JLink",
+        "type": "shell",
+        "command": "/mnt/c/Program Files/SEGGER/JLink/JLink.exe",
+        "args": [
+            "-CommandFile", "${workspaceFolder}/tools/flash.jlink"
+        ],
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "dedicated"
+        },
+        "problemMatcher": []
+        }
+  ]
+}

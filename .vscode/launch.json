@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug with J-Link (SWD)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "external",
+      "cwd": "${workspaceRoot}",
+      "executable": "${workspaceRoot}/build/out/STM32F407_Project.elf",
+      "device": "STM32F407ZG",
+      "interface": "swd",
+      "runToEntryPoint": "main",
+      // "preLaunchTask": "Start JLink GDB Server",
+      "gdbTarget": "10.16.10.31:2331",
+      "svdFile": "${workspaceRoot}/build/debug/svd/STM32F407.svd",
+      "gdbPath": "${workspaceRoot}/build/compiler/arm-gnu-toolchain-14/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gdb",
+    }
+  ]
+}
