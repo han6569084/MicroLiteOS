@@ -7,13 +7,13 @@
       "request": "launch",
       "servertype": "external",
       "cwd": "${workspaceRoot}",
-      "executable": "${workspaceRoot}/build/out/STM32F407_Project.elf",
-      "device": "STM32F407ZG",
+      "executable": "${workspaceRoot}/build/out/STM32F429_Project.elf",
+      "device": "STM32F429ZG",
       "interface": "swd",
-      "runToEntryPoint": "main",
+      // "runToEntryPoint": "main",
       // "preLaunchTask": "Start JLink GDB Server",
-      "gdbTarget": "10.16.10.31:2331",
-      "svdFile": "${workspaceRoot}/build/debug/svd/STM32F407.svd",
+      "gdbTarget": "192.168.1.119:2331",
+      "svdFile": "${workspaceRoot}/build/debug/svd/STM32F429x.svd",
       "gdbPath": "${workspaceRoot}/build/compiler/arm-gnu-toolchain-14/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gdb",
     }
   ]

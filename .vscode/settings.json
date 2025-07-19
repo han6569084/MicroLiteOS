@@ -35,6 +35,11 @@
         "stm32f4xx_gpio.h": "c",
         "stm32f4xx_usart.h": "c",
         "misc.h": "c",
-        "format": "c"
-    }
+        "format": "c",
+        "os_tick.h": "c",
+        "lv_demo_widgets.h": "c",
+        "bsp_lcd.h": "c",
+        "cstdlib": "c"
+    },
+    "cortex-debug.variableUseNaturalFormat": false
 }

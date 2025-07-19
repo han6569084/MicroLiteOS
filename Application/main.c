@@ -9,6 +9,15 @@
 #include <timers.h>
 #include <semphr.h>
 #include "cmsis_os2.h"
+#include "lvgl.h"
+#include "bsp_sdram.h"
+#include "bsp_lcd.h"
+#include <string.h>
+#include "../lvgl/demos/widgets/lv_demo_widgets.h"
+#include "bsp_touch_gtxx.h"
+#include "stm32f4xx_dma2d.h"
+#include "misc.h"
+#include "../lvgl/src/draw/dma2d/lv_draw_dma2d.h"
 
 /* Standard includes. */
 #include <stdio.h>
@@ -90,11 +99,11 @@ void HardFault_Handler_C(uint32_t *hardfault_args)
 volatile uint8_t s_ledColor = 0;
 volatile uint64_t s_timeLeft = 0;
 
-void EXTI15_10_IRQHandler(void)
-{
-	EXTI_ClearFlag(EXTI_Line13);
-	s_ledColor++;
-}
+// void EXTI15_10_IRQHandler(void)
+// {
+// 	EXTI_ClearFlag(EXTI_Line13);
+// 	s_ledColor++;
+// }
 
 // void SysTick_Handler(void)
 // {
@@ -182,12 +191,12 @@ ErrorStatus SHT4x_ReadTempHumid(float *temperature, float *humidity, uint8_t pre
     I2C_GenerateSTOP(SHT4x_I2C, ENABLE);
 
     switch(precision_cmd) {
-        case HIGH_PRECISION_CMD: vTaskDelay(9); break;    //
-        case MEDIUM_PRECISION_CMD: vTaskDelay(5); break;   //
-        case LOW_PRECISION_CMD: vTaskDelay(2); break;      //
-        default: vTaskDelay(10); break;
+        case HIGH_PRECISION_CMD: osDelay(9); break;    //
+        case MEDIUM_PRECISION_CMD: osDelay(5); break;   //
+        case LOW_PRECISION_CMD: osDelay(2); break;      //
+        default: osDelay(10); break;
     }
-    // vTaskDelay(8000);
+    // osDelay(8000);
     I2C_GenerateSTART(SHT4x_I2C, ENABLE);
     if(I2C_WaitEvent(SHT4x_I2C, I2C_EVENT_MASTER_MODE_SELECT, 1000) == ERROR)
         goto ERROR_NACK;
@@ -307,10 +316,10 @@ ErrorStatus SHT4x_ReadTempHumid_DMA(float *temperature, float *humidity, uint8_t
     I2C_GenerateSTOP(I2C1, ENABLE);
 
     switch (precision_cmd) {
-        case HIGH_PRECISION_CMD: vTaskDelay(9); break;    // 8.2ms
-        case MEDIUM_PRECISION_CMD: vTaskDelay(5); break;  // 4.5ms
-        case LOW_PRECISION_CMD: vTaskDelay(2); break;     // 1.5ms
-        default: vTaskDelay(10); break;
+        case HIGH_PRECISION_CMD: osDelay(9); break;    // 8.2ms
+        case MEDIUM_PRECISION_CMD: osDelay(5); break;  // 4.5ms
+        case LOW_PRECISION_CMD: osDelay(2); break;     // 1.5ms
+        default: osDelay(10); break;
     }
 
     printf("I2C_DMA \r\n");
@@ -338,7 +347,7 @@ ErrorStatus SHT4x_ReadTempHumid_DMA(float *temperature, float *humidity, uint8_t
     I2C_DMACmd(I2C1, ENABLE);
 
     while (!dmaComplete) {
-        vTaskDelay(1);
+        osDelay(1);
     }
 
     I2C_DMACmd(I2C1, DISABLE);
@@ -388,77 +397,296 @@ ErrorStatus SHT4x_ReadHighPrecision(float *temperature, float *humidity)
     // return SHT4x_ReadTempHumid(temperature, humidity, HIGH_PRECISION_CMD);
 }
 
-// int main(void)
-// {
-//     float temp, humid;
-// 	LED_GPIO_Config();
-// 	KEY_GPIO_Config();
-// 	NVIC_SetPriority(EXTI15_10_IRQn, 0);
-// 	NVIC_EnableIRQ(EXTI15_10_IRQn);
-// 	SysTick->LOAD = (SystemCoreClock / 1000) - 1;
-//     SysTick->VAL = 0;
-//     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk |
-//                 SysTick_CTRL_TICKINT_Msk |
-//                 SysTick_CTRL_ENABLE_Msk;
-
-// 	EXTI_Config();
-//     EXTI_MPU_Config();
-//     I2cMaster_Init();
-//     SHT4x_DMA_Init();
-//     Usart_Config();
-//     vTaskDelay(1000);
-
-// }
-
-// void vTaskDelay(__IO uint32_t nCount)
-// {
-//     s_timeLeft = nCount;
-// 	for(; s_timeLeft != 0; );
-// }
-
-
+#if 0
 static void sysCoreTask( void * argument );
+// 8x16点阵“H”字，RGB565格式，白底黑字
+const uint16_t hello_bitmap_write[16][8] = {
+    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}, // 第一行
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000}, // 第二行
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000}, // ...
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
+    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}
+};
 
-/*-----------------------------------------------------------*/
+const uint16_t hello_bitmap_red[16][8] = {
+    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0xF800,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0xF800,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
+    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}
+};
 
+const uint16_t hello_bitmap_blue[16][8] = {
+    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x001F,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x001F,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
+    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}
+};
+void LCD_DrawBitmap_Center(const uint16_t *bitmap, uint16_t bmp_w, uint16_t bmp_h)
+{
+    uint16_t *fb = (uint16_t *)LCD_BUFFER;
+    uint16_t x0 = (LCD_PIXEL_WIDTH - bmp_w) / 2;
+    uint16_t y0 = (LCD_PIXEL_HEIGHT - bmp_h) / 2;
+
+    for (uint16_t y = 0; y < bmp_h; y++) {
+        for (uint16_t x = 0; x < bmp_w; x++) {
+            fb[(y0 + y) * LCD_PIXEL_WIDTH + (x0 + x)] = bitmap[y * bmp_w + x];
+        }
+    }
+}
+
+static void lcdTestTask( void * argument )
+{
+    printf("lcdTestTask start\r\n");
+    int i = 0;
+    while (1)
+    {
+        printf("start test\r\n");
+        if (i % 3 == 0) {
+            LCD_DrawBitmap_Center((const uint16_t *)hello_bitmap_write, 8, 16);
+            printf("hello_bitmap_write\r\n");
+        } else if (i % 3 == 1) {
+            LCD_DrawBitmap_Center((const uint16_t *)hello_bitmap_red, 8, 16);
+            printf("hello_bitmap_red\r\n");
+        } else if (i % 3 == 2) {
+            LCD_DrawBitmap_Center((const uint16_t *)hello_bitmap_blue, 8, 16);
+            printf("hello_bitmap_blue\r\n");
+        }
+
+        osDelay(1000);
+        i++;
+        printf("test end\r\n");
+    }
+}
+#endif
+
+void DMA2D_IRQHandler(void)
+{
+    printf("DMA2D_IRQHandler called\r\n");
+    DMA2D_ClearFlag(DMA2D_FLAG_TC | DMA2D_FLAG_TW | DMA2D_FLAG_CE | DMA2D_FLAG_TE);
+    lv_draw_dma2d_transfer_complete_interrupt_handler();
+}
+
+static lv_draw_buf_t draw_buf;
+static lv_color_t *lvgl_buf1 = (lv_color_t *)LCD_BUFFER; // 直接用 FrameBuffer
+
+static void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
+{
+    printf("my_flush_cb called\r\n");
+    lv_color_t *fb = (lv_color_t *)LCD_BUFFER;
+    for(int y = area->y1; y <= area->y2; y++) {
+        memcpy(
+            &fb[y * LCD_PIXEL_WIDTH + area->x1],
+            color_p,
+            (area->x2 - area->x1 + 1) * sizeof(lv_color_t)
+        );
+        color_p += (area->x2 - area->x1 + 1) * sizeof(lv_color_t);
+    }
+    lv_display_flush_ready(disp);
+}
+
+static void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data)
+{
+    volatile int x = 0, y = 0;
+    printf("my_touchpad_read called\r\n");
+    GTP_Execu(&x, &y);
+    if (x > 0 && y > 0) {
+        data->point.x = x;
+        data->point.y = y;
+        data->state = LV_INDEV_STATE_PRESSED;
+    } else {
+        data->state = LV_INDEV_STATE_RELEASED;
+    }
+    printf("Touch at (%d, %d), state: %d\r\n", data->point.x, data->point.y, data->state);
+}
+
+void hal_init(void)
+{
+    lv_draw_buf_init(
+        &draw_buf,
+        LCD_PIXEL_WIDTH,
+        LCD_PIXEL_HEIGHT,
+        LV_COLOR_FORMAT_NATIVE,
+        LCD_PIXEL_WIDTH,
+        lvgl_buf1,
+        LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * sizeof(lv_color_t)
+    );
+
+    lv_display_t *disp = lv_display_create(LCD_PIXEL_WIDTH, LCD_PIXEL_HEIGHT);
+    lv_display_set_flush_cb(disp, my_flush_cb);
+    lv_display_set_buffers(disp, lvgl_buf1, NULL, LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * sizeof(lv_color_t), LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
+
+    lv_indev_t *touchpad_indev = lv_indev_create();
+    if (touchpad_indev == NULL) {
+        printf("lv_indev_create failed\r\n");
+        return;
+    }
+
+    lv_indev_set_type(touchpad_indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(touchpad_indev, my_touchpad_read);
+
+    lv_indev_set_mode(touchpad_indev, LV_INDEV_MODE_TIMER);
+    lv_indev_enable(touchpad_indev, true);
+    printf("lv_indev_create success\r\n");
+}
+
+void lvglTimerCb (void *argument)
+{
+    lv_tick_inc(5);
+}
+
+static void lvglGuiTask( void * argument )
+{
+
+    LCD_Init(LCD_BUFFER, 0, LTDC_Pixelformat_RGB565);
+    GTP_Init_Panel();
+
+	/* DMA2D configuration */
+	// DMA2D_InitTypeDef dma2d_init;
+    // DMA2D_StructInit(&dma2d_init);
+    // dma2d_init.DMA2D_CMode = DMA2D_RGB565;
+    // dma2d_init.DMA2D_OutputOffset = LCD_PIXEL_WIDTH - 240;
+    // dma2d_init.DMA2D_Mode = DMA2D_M2M_PFC; // Memory to Memory with Pixel Format Conversion
+    // DMA2D_Init(&dma2d_init);
+	// DMA2D_ITConfig(DMA2D_IT_TC,ENABLE);
+	// DMA2D_ClearFlag(DMA2D_FLAG_TC);
+	// DMA2D_ClearITPendingBit(DMA2D_IT_TC);
+    // NVIC_InitTypeDef   nvic_init;
+    // nvic_init.NVIC_IRQChannel = DMA2D_IRQn;
+    // nvic_init.NVIC_IRQChannelPreemptionPriority =5;
+    // nvic_init.NVIC_IRQChannelSubPriority = 0;//
+    // nvic_init.NVIC_IRQChannelCmd = ENABLE;//
+    // NVIC_Init(&nvic_init);//
+    // NVIC_EnableIRQ(DMA2D_IRQn);
+
+    LCD_BackLed_Control(ENABLE);
+    /*Initialize LittlevGL*/
+    lv_init();
+
+    /*Initialize the HAL (display, input devices, tick) for LittlevGL*/
+    hal_init();
+
+    lv_demo_widgets();
+
+    printf("lvglGuiTask start\r\n");
+    while (1)
+    {
+        /*Call the lv_task handler periodically*/
+        lv_timer_handler();
+        osDelay(5);
+    }
+}
+float g_temp = 0.0f;
+float g_humid = 0.0f;
+int   g_posx = 0;
+int   g_posy = 0;
 static void sysCoreTask( void * argument )
 {
     float temp, humid;
     printf("sysCoreTask start\r\n");
+
+    osThreadAttr_t attr_thread = {
+        .name = "lvglGuiTask",
+        .priority = osPriorityHigh,
+        .stack_size = 40*1024
+    };
+    osThreadNew(lvglGuiTask, NULL, &attr_thread);
+
+    osTimerAttr_t attr_timer = {
+        .name = "lvglTimer",
+        .attr_bits = osTimerPeriodic,
+        .cb_mem = NULL,
+        .cb_size = 0
+    };
+    osTimerId_t lvglTimer = osTimerNew(lvglTimerCb, osTimerPeriodic, NULL, &attr_timer);
+    if (lvglTimer == NULL) {
+        printf("osTimerNew failed\r\n");
+    } else {
+        osTimerStart(lvglTimer, 5);
+        printf("osTimerNew success\r\n");
+    }
+
     printf("start measure\r\n");
     while (1)
     {
-        if(SHT4x_ReadHighPrecision(&temp, &humid) == SUCCESS) {
-            printf("temp:%lf, humid:%lf \r\n", temp, humid);
-            LED_GREEN;
-        } else {
-            printf("mesure faild\r\n");
-            LED_BLUE;
-        }
-        printf("delay 1000ms\r\n");
-        osDelay(1000);
-        printf("sysCoreTask running\r\n");
+        // if(SHT4x_ReadHighPrecision(&temp, &humid) == SUCCESS) {
+        //     printf("temp:%lf, humid:%lf \r\n", temp, humid);
+        //     g_temp = temp;
+        //     g_humid = humid;
+        //     LED_GREEN;
+        // } else {
+        //     printf("mesure faild\r\n");
+        //     LED_BLUE;
+        // }
+        // int x = 0, y = 0;
+        // GTP_Execu(&x, &y);
+        // g_posx = x;
+        // g_posy = y;
+        // if (x > 0 && y > 0) {
+        //     printf("touch at (%d, %d)\r\n", x, y);
+        // }
+        // printf("delay 50ms\r\n");
+        osDelay(50);
+        // printf("sysCoreTask running\r\n");
     }
 }
 
-/*-----------------------------------------------------------*/
+__attribute__((section(".sdram"))) uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
 
 int main( void )
 {
     SystemCoreClockUpdate();
     LED_GPIO_Config();
-    KEY_GPIO_Config();
+    // KEY_GPIO_Config();
+    SDRAM_Init();
     NVIC_SetPriority(EXTI15_10_IRQn, 5);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
-    EXTI_Config();
+    // EXTI_Config();
     EXTI_MPU_Config();
-    I2cMaster_Init();
-    SHT4x_DMA_Init();
+    // I2cMaster_Init();
+    // SHT4x_DMA_Init();
     Usart_Config();
 
     ( void ) printf( "sysCoreTask FreeRTOS Project\r\n" );
     printf("SystemCoreClock = %lu\r\n", SystemCoreClock);
 
+    // LCD_Init(LCD_BUFFER, 0, LTDC_Pixelformat_RGB565);
+    // LCD_BackLed_Control(ENABLE);
     osKernelInitialize();
     osThreadNew(sysCoreTask, NULL, NULL);
     osKernelStart();

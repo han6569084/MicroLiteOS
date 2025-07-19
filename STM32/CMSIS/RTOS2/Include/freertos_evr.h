@@ -26,8 +26,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "RTE_Components.h"
-
 #if !defined(RTE_Compiler_EventRecorder) && !defined(RTE_CMSIS_View_EventRecorder)
   /* Disable debug events if Event Recorder is not used */
   #ifndef EVR_FREERTOS_DISABLE
@@ -864,7 +862,7 @@ extern void EvrFreeRTOSTasks_vTaskPlaceOnEventList_Return (void);
 extern void EvrFreeRTOSTasks_vTaskPlaceOnUnorderedEventList (List_t *pxEventList, const TickType_t xItemValue, const TickType_t xTicksToWait);
 
 /**
-  \brief Event sent before function vTaskPlaceOnUnorderedEventList returns (Op). 
+  \brief Event sent before function vTaskPlaceOnUnorderedEventList returns (Op).
 */
 extern void EvrFreeRTOSTasks_vTaskPlaceOnUnorderedEventList_Return (void);
 
