@@ -18,6 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_lcd.h"
+#include "stm32f4xx_ltdc.h"
 
 /* 不同液晶屏的参数 */
 const LCD_PARAM_TypeDef lcd_param[LCD_TYPE_NUM]={

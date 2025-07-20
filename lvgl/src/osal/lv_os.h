@@ -21,6 +21,8 @@ extern "C" {
 
 #include "../misc/lv_types.h"
 
+#include "cmsis_os2.h"
+
 #if LV_USE_OS == LV_OS_NONE
 #include "lv_os_none.h"
 #elif LV_USE_OS == LV_OS_PTHREAD
@@ -49,11 +51,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef enum {
-    LV_THREAD_PRIO_LOWEST,
-    LV_THREAD_PRIO_LOW,
-    LV_THREAD_PRIO_MID,
-    LV_THREAD_PRIO_HIGH,
-    LV_THREAD_PRIO_HIGHEST,
+    LV_THREAD_PRIO_LOWEST = osPriorityIdle,
+    LV_THREAD_PRIO_LOW = osPriorityLow,
+    LV_THREAD_PRIO_MID = osPriorityNormal,
+    LV_THREAD_PRIO_HIGH = osPriorityHigh,
+    LV_THREAD_PRIO_HIGHEST = osPriorityRealtime,
 } lv_thread_prio_t;
 
 /**********************

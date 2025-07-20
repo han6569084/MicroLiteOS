@@ -4,25 +4,29 @@
 #include "stdio.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_dma.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_usart.h"
+#include "misc.h"
 
-/*----------------------USARTÅäÖÃºê ------------------------*/
+/*----------------------USARTï¿½ï¿½ï¿½Ãºï¿½ ------------------------*/
 
 #define  USART6_BaudRate  115200
 
-#define  USART6_TX_PIN				GPIO_Pin_6					// TX Òý½Å
-#define	USART6_TX_PORT				GPIOC							// TX Òý½Å¶Ë¿Ú
-#define	USART6_TX_CLK				RCC_AHB1Periph_GPIOC		// TX Òý½ÅÊ±ÖÓ
-#define  USART6_TX_PinSource     GPIO_PinSource6			// Òý½ÅÔ´
+#define  USART6_TX_PIN				GPIO_Pin_6					// TX ï¿½ï¿½ï¿½ï¿½
+#define	USART6_TX_PORT				GPIOC							// TX ï¿½ï¿½ï¿½Å¶Ë¿ï¿½
+#define	USART6_TX_CLK				RCC_AHB1Periph_GPIOC		// TX ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+#define  USART6_TX_PinSource     GPIO_PinSource6			// ï¿½ï¿½ï¿½ï¿½Ô´
 
-#define  USART6_RX_PIN				GPIO_Pin_7             // RX Òý½Å
-#define	USART6_RX_PORT				GPIOC                   // RX Òý½Å¶Ë¿Ú
-#define	USART6_RX_CLK				RCC_AHB1Periph_GPIOC    // RX Òý½ÅÊ±ÖÓ
-#define  USART6_RX_PinSource     GPIO_PinSource7        // Òý½ÅÔ´
+#define  USART6_RX_PIN				GPIO_Pin_7             // RX ï¿½ï¿½ï¿½ï¿½
+#define	USART6_RX_PORT				GPIOC                   // RX ï¿½ï¿½ï¿½Å¶Ë¿ï¿½
+#define	USART6_RX_CLK				RCC_AHB1Periph_GPIOC    // RX ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+#define  USART6_RX_PinSource     GPIO_PinSource7        // ï¿½ï¿½ï¿½ï¿½Ô´
 
 
-/*---------------------- º¯ÊýÉùÃ÷ ----------------------------*/
+/*---------------------- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ----------------------------*/
 
-void  Usart_Config (void);	// USART³õÊ¼»¯º¯Êý
+void  Usart_Config (void);	// USARTï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void  USART_GPIO_Config	(void);
 void  USART1_Init(uint32_t baudrate);
 void  DMA_USART1_TX_Init(uint8_t *buf, uint16_t len);

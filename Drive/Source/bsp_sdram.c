@@ -16,6 +16,7 @@
   */
 
 #include "bsp_sdram.h"
+#include "stm32f4xx_fmc.h"
 
 /**
   * @brief  延迟一段时间

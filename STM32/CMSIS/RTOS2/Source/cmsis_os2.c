@@ -119,7 +119,7 @@ static osKernelState_t KernelState = osKernelInactive;
     HeapRegion_t array.
   */
   #define HEAP_5_REGION_SETUP   1
-  
+
   #ifndef configHEAP_5_REGIONS
     #define configHEAP_5_REGIONS xHeapRegions
 
@@ -231,6 +231,12 @@ osStatus_t osKernelInitialize (void) {
 
   /* Return execution status */
   return (stat);
+}
+
+osStatus_t osThreadDetach(osThreadId_t thread_id) {
+    // FreeRTOS 没有 detach 语义，直接返回 OK
+    (void)thread_id;
+    return osOK;
 }
 
 /*
@@ -2020,7 +2026,7 @@ osSemaphoreId_t osSemaphoreNew (uint32_t max_count, uint32_t initial_count, cons
           #endif
         }
       }
-      
+
       #if (configQUEUE_REGISTRY_SIZE > 0)
       if (hSemaphore != NULL) {
         if ((attr != NULL) && (attr->name != NULL)) {

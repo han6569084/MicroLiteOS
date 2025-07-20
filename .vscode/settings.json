@@ -39,7 +39,11 @@
         "os_tick.h": "c",
         "lv_demo_widgets.h": "c",
         "bsp_lcd.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "cmsis_os2.h": "c",
+        "semphr.h": "c",
+        "usart.h": "c",
+        "stdio.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }

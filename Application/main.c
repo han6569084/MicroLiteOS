@@ -497,6 +497,7 @@ static void lcdTestTask( void * argument )
 void DMA2D_IRQHandler(void)
 {
     printf("DMA2D_IRQHandler called\r\n");
+    printf("DMA2D_IRQHandler priority: %d\r\n", NVIC->IP[90]);
     DMA2D_ClearFlag(DMA2D_FLAG_TC | DMA2D_FLAG_TW | DMA2D_FLAG_CE | DMA2D_FLAG_TE);
     lv_draw_dma2d_transfer_complete_interrupt_handler();
 }
@@ -576,24 +577,6 @@ static void lvglGuiTask( void * argument )
     LCD_Init(LCD_BUFFER, 0, LTDC_Pixelformat_RGB565);
     GTP_Init_Panel();
 
-	/* DMA2D configuration */
-	// DMA2D_InitTypeDef dma2d_init;
-    // DMA2D_StructInit(&dma2d_init);
-    // dma2d_init.DMA2D_CMode = DMA2D_RGB565;
-    // dma2d_init.DMA2D_OutputOffset = LCD_PIXEL_WIDTH - 240;
-    // dma2d_init.DMA2D_Mode = DMA2D_M2M_PFC; // Memory to Memory with Pixel Format Conversion
-    // DMA2D_Init(&dma2d_init);
-	// DMA2D_ITConfig(DMA2D_IT_TC,ENABLE);
-	// DMA2D_ClearFlag(DMA2D_FLAG_TC);
-	// DMA2D_ClearITPendingBit(DMA2D_IT_TC);
-    // NVIC_InitTypeDef   nvic_init;
-    // nvic_init.NVIC_IRQChannel = DMA2D_IRQn;
-    // nvic_init.NVIC_IRQChannelPreemptionPriority =5;
-    // nvic_init.NVIC_IRQChannelSubPriority = 0;//
-    // nvic_init.NVIC_IRQChannelCmd = ENABLE;//
-    // NVIC_Init(&nvic_init);//
-    // NVIC_EnableIRQ(DMA2D_IRQn);
-
     LCD_BackLed_Control(ENABLE);
     /*Initialize LittlevGL*/
     lv_init();
@@ -608,7 +591,7 @@ static void lvglGuiTask( void * argument )
     {
         /*Call the lv_task handler periodically*/
         lv_timer_handler();
-        osDelay(5);
+        // osDelay(5);
     }
 }
 float g_temp = 0.0f;
@@ -619,14 +602,6 @@ static void sysCoreTask( void * argument )
 {
     float temp, humid;
     printf("sysCoreTask start\r\n");
-
-    osThreadAttr_t attr_thread = {
-        .name = "lvglGuiTask",
-        .priority = osPriorityHigh,
-        .stack_size = 40*1024
-    };
-    osThreadNew(lvglGuiTask, NULL, &attr_thread);
-
     osTimerAttr_t attr_timer = {
         .name = "lvglTimer",
         .attr_bits = osTimerPeriodic,
@@ -640,6 +615,14 @@ static void sysCoreTask( void * argument )
         osTimerStart(lvglTimer, 5);
         printf("osTimerNew success\r\n");
     }
+
+    osThreadAttr_t attr_thread = {
+        .name = "lvglGuiTask",
+        .priority = osPriorityHigh,
+        .stack_size = 40*1024
+    };
+    osThreadNew(lvglGuiTask, NULL, &attr_thread);
+
 
     printf("start measure\r\n");
     while (1)
@@ -676,17 +659,18 @@ int main( void )
     SDRAM_Init();
     NVIC_SetPriority(EXTI15_10_IRQn, 5);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
+    NVIC_SetPriorityGrouping(0);
+    NVIC_SetPriority(DMA2D_IRQn, 8);
     // EXTI_Config();
     EXTI_MPU_Config();
     // I2cMaster_Init();
     // SHT4x_DMA_Init();
     Usart_Config();
 
+    printf("DMA2D_IRQn = %d, IP = %d\r\n", DMA2D_IRQn, NVIC_GetPriority(DMA2D_IRQn));
     ( void ) printf( "sysCoreTask FreeRTOS Project\r\n" );
     printf("SystemCoreClock = %lu\r\n", SystemCoreClock);
 
-    // LCD_Init(LCD_BUFFER, 0, LTDC_Pixelformat_RGB565);
-    // LCD_BackLed_Control(ENABLE);
     osKernelInitialize();
     osThreadNew(sysCoreTask, NULL, NULL);
     osKernelStart();

@@ -1,5 +1,22 @@
 cmake_minimum_required(VERSION 3.15)
+
 project(STM32F429_Project C ASM)
+
+# 公共变量
+set(CPU_FLAGS -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
+set(COMMON_C_FLAGS ${CPU_FLAGS} -Wall -O0 -g -fdiagnostics-color=always -Wextra -Wno-conversion -Wno-unused-parameter -std=c11)
+set(COMMON_DEFINES STM32F429_439xx USE_STDPERIPH_DRIVER __FPU_PRESENT=1 ARM_MATH_CM4)
+set(COMMON_INCLUDES
+    ${CMAKE_SOURCE_DIR}/Application
+    ${CMAKE_SOURCE_DIR}/Drive/Include
+    ${CMAKE_SOURCE_DIR}/FreeRTOS/include
+    ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM4F
+    ${CMAKE_SOURCE_DIR}/CMSIS_5-develop/CMSIS/Core/Include
+    ${CMAKE_SOURCE_DIR}/STM32/CMSIS/Device/ST/STM32F4xx/Include
+    ${CMAKE_SOURCE_DIR}/STM32/STM32F4xx_StdPeriph_Driver/inc
+    ${CMAKE_SOURCE_DIR}/CMSIS_5-develop/CMSIS/RTOS2/Include
+    ${CMAKE_SOURCE_DIR}/CMSIS-FreeRTOS-main/CMSIS/RTOS2/FreeRTOS/Include
+)
 
 set(FREERTOS_KERNEL_PATH "FreeRTOS")
 # Add the freertos_config for FreeRTOS-Kernel
@@ -9,8 +26,9 @@ target_include_directories(freertos_config
     "Application"
     STM32/CMSIS/Device/ST/STM32F4xx/Include
     STM32/STM32F4xx_StdPeriph_Driver/inc
-    STM32/CMSIS/Include
-    STM32/CMSIS/RTOS2/Include
+    CMSIS_5-develop/CMSIS/Core/Include
+    CMSIS_5-develop/CMSIS/RTOS2/Include
+    CMSIS-FreeRTOS-main/CMSIS/RTOS2/FreeRTOS/Include
 )
 
 # Select the heap port.  values between 1-4 will pick a heap.
@@ -21,133 +39,47 @@ set(FREERTOS_PORT "GCC_ARM_CM4F" CACHE STRING "" FORCE)
 # Adding the FreeRTOS-Kernel subdirectory
 add_subdirectory(${FREERTOS_KERNEL_PATH} FreeRTOS-Kernel)
 
-target_compile_definitions(freertos_kernel PRIVATE STM32F429_439xx STM32F4 USE_STDPERIPH_DRIVER )
 
-target_compile_options(freertos_kernel PRIVATE
-    -mcpu=cortex-m4
-    -mthumb
-    -mfloat-abi=hard
-    -mfpu=fpv4-sp-d16
-    -Os
-    -fdiagnostics-color=always
-    -Wall
-    -Wextra
-    -Wno-conversion
-    -Wno-unused-parameter
-    -std=c11
-)
+target_compile_definitions(freertos_kernel PRIVATE ${COMMON_DEFINES} STM32F4)
+target_compile_options(freertos_kernel PRIVATE ${COMMON_C_FLAGS})
+target_include_directories(freertos_kernel PRIVATE ${COMMON_INCLUDES})
 
-target_include_directories(freertos_kernel PRIVATE
-    ${CMAKE_SOURCE_DIR}/STM32/STM32F4xx_StdPeriph_Driver/inc
-)
 
 if(TARGET freertos_kernel_port)
-    target_compile_options(freertos_kernel_port PRIVATE
-        -mcpu=cortex-m4
-        -mthumb
-        -mfloat-abi=hard
-        -mfpu=fpv4-sp-d16
-        -std=c11
-    )
-    target_compile_definitions(freertos_kernel_port PRIVATE STM32F429_439xx USE_STDPERIPH_DRIVER __FPU_PRESENT=1 ARM_MATH_CM4)
+    target_compile_options(freertos_kernel_port PRIVATE ${CPU_FLAGS} -std=c11)
+    target_compile_definitions(freertos_kernel_port PRIVATE ${COMMON_DEFINES})
 endif()
 
-# set_property(TARGET freertos_kernel PROPERTY C_STANDARD 11)
+
 set(LV_BUILD_CONF_PATH "${CMAKE_SOURCE_DIR}/Application/lv_conf.h" CACHE PATH "lvgl conf" FORCE)
 include_directories(${CMAKE_SOURCE_DIR}/Application)
 add_subdirectory(lvgl)
 
 # 同步编译选项到 lvgl
 if(TARGET lvgl)
-    target_compile_options(lvgl PRIVATE
-        -mcpu=cortex-m4
-        -mthumb
-        -mfloat-abi=hard
-        -mfpu=fpv4-sp-d16
-        -Os
-        -Wall
-        -Wextra
-        -Wno-conversion
-        -Wno-unused-parameter
-        -std=c11
-    )
-    target_compile_definitions(lvgl PRIVATE STM32F429_439xx USE_STDPERIPH_DRIVER __FPU_PRESENT=1 ARM_MATH_CM4)
-    target_include_directories(lvgl PRIVATE
-        ${CMAKE_SOURCE_DIR}/Application
-        ${CMAKE_SOURCE_DIR}/Drive/Include
-        ${CMAKE_SOURCE_DIR}/FreeRTOS/include
-        ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM4F
-        ${CMAKE_SOURCE_DIR}/STM32/CMSIS/Include
-        ${CMAKE_SOURCE_DIR}/STM32/CMSIS/Device/ST/STM32F4xx/Include
-        ${CMAKE_SOURCE_DIR}/STM32/STM32F4xx_StdPeriph_Driver/inc
-        ${CMAKE_SOURCE_DIR}/STM32/CMSIS/RTOS2/Include
-    )
+    target_compile_options(lvgl PRIVATE ${COMMON_C_FLAGS})
+    target_compile_definitions(lvgl PRIVATE ${COMMON_DEFINES})
+    target_include_directories(lvgl PRIVATE ${COMMON_INCLUDES})
 endif()
 
 
-# 同步编译选项到 lvgl
+
+# 同步编译选项到 lvgl_examples
 if(TARGET lvgl_examples)
-    target_compile_options(lvgl_examples PRIVATE
-        -mcpu=cortex-m4
-        -mthumb
-        -mfloat-abi=hard
-        -mfpu=fpv4-sp-d16
-        -Os
-        -Wall
-        -Wextra
-        -Wno-conversion
-        -Wno-unused-parameter
-        -std=c11
-    )
-    target_compile_definitions(lvgl_examples PRIVATE STM32F429_439xx USE_STDPERIPH_DRIVER __FPU_PRESENT=1 ARM_MATH_CM4)
-    target_include_directories(lvgl_examples PRIVATE
-        ${CMAKE_SOURCE_DIR}/Application
-        ${CMAKE_SOURCE_DIR}/Drive/Include
-        ${CMAKE_SOURCE_DIR}/FreeRTOS/include
-        ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM4F
-        ${CMAKE_SOURCE_DIR}/STM32/CMSIS/Include
-        ${CMAKE_SOURCE_DIR}/STM32/CMSIS/Device/ST/STM32F4xx/Include
-        ${CMAKE_SOURCE_DIR}/STM32/STM32F4xx_StdPeriph_Driver/inc
-        ${CMAKE_SOURCE_DIR}/STM32/CMSIS/RTOS2/Include
-    )
+    target_compile_options(lvgl_examples PRIVATE ${COMMON_C_FLAGS})
+    target_compile_definitions(lvgl_examples PRIVATE ${COMMON_DEFINES})
+    target_include_directories(lvgl_examples PRIVATE ${COMMON_INCLUDES})
 endif()
 
-# 同步编译选项到 lvgl
+
+# 同步编译选项到 lvgl_demos
 if(TARGET lvgl_demos)
-    target_compile_options(lvgl_demos PRIVATE
-        -mcpu=cortex-m4
-        -mthumb
-        -mfloat-abi=hard
-        -mfpu=fpv4-sp-d16
-        -Os
-        -Wall
-        -Wextra
-        -Wno-conversion
-        -Wno-unused-parameter
-        -std=c11
-    )
-    target_compile_definitions(lvgl_demos PRIVATE STM32F429_439xx USE_STDPERIPH_DRIVER __FPU_PRESENT=1 ARM_MATH_CM4)
-    target_include_directories(lvgl_demos PRIVATE
-        ${CMAKE_SOURCE_DIR}/Application
-        ${CMAKE_SOURCE_DIR}/Drive/Include
-        ${CMAKE_SOURCE_DIR}/FreeRTOS/include
-        ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM4F
-        ${CMAKE_SOURCE_DIR}/STM32/CMSIS/Include
-        ${CMAKE_SOURCE_DIR}/STM32/CMSIS/Device/ST/STM32F4xx/Include
-        ${CMAKE_SOURCE_DIR}/STM32/STM32F4xx_StdPeriph_Driver/inc
-        ${CMAKE_SOURCE_DIR}/STM32/CMSIS/RTOS2/Include
-    )
+    target_compile_options(lvgl_demos PRIVATE ${COMMON_C_FLAGS})
+    target_compile_definitions(lvgl_demos PRIVATE ${COMMON_DEFINES})
+    target_include_directories(lvgl_demos PRIVATE ${COMMON_INCLUDES})
 endif()
 
-# 设置 CPU 架构
-set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
-
-# 编译选项
-set(CMAKE_C_FLAGS "${CPU_FLAGS} -Wall -O0 -g")
-set(CMAKE_ASM_FLAGS "${CPU_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS
-    "${CPU_FLAGS} -Wl,--gc-sections -T${CMAKE_SOURCE_DIR}/linker/STM32F429NI_FLASH.ld -Wl,-Map=${PROJECT_NAME}.map"
-)
+# 设置链接选项由 target_link_options 传递，避免参数被拼成单一字符串
 # 启动文件（汇编）
 set(STARTUP startup/startup_stm32f429xx.s)
 
@@ -187,23 +119,10 @@ set(SOURCES
 )
 
 # 添加 CMSIS-RTOS2 适配层源码
-list(APPEND SOURCES STM32/CMSIS/RTOS2/Source/cmsis_os2.c)
-list(APPEND SOURCES STM32/CMSIS/RTOS2/Source/os_systick.c)
+list(APPEND SOURCES CMSIS-FreeRTOS-main/CMSIS/RTOS2/FreeRTOS/Source/cmsis_os2.c)
+list(APPEND SOURCES CMSIS_5-develop/CMSIS/RTOS2/Source/os_systick.c)
 
-# 头文件包含路径
-include_directories(
-    Application
-    Drive/Include
-    lvgl
-    FreeRTOS/include
-    FreeRTOS/portable/GCC/ARM_CM4F
-    STM32/CMSIS/Include
-    STM32/CMSIS/Device/ST/STM32F4xx/Include
-    STM32/STM32F4xx_StdPeriph_Driver/inc
-    STM32/CMSIS/RTOS2/Include
-)
 
-add_compile_definitions(STM32F429_439xx USE_STDPERIPH_DRIVER __FPU_PRESENT=1 ARM_MATH_CM4)
 
 # 创建 elf 文件
 add_executable(${PROJECT_NAME}.elf
@@ -212,6 +131,30 @@ add_executable(${PROJECT_NAME}.elf
     $<TARGET_OBJECTS:lvgl_examples>
     $<TARGET_OBJECTS:lvgl_demos>
     $<TARGET_OBJECTS:lvgl>
+)
+
+target_link_options(${PROJECT_NAME}.elf PRIVATE
+    ${CPU_FLAGS}
+    -Wl,--gc-sections
+    -T${CMAKE_SOURCE_DIR}/linker/STM32F429NI_FLASH.ld
+    -Wl,-Map=${PROJECT_NAME}.map
+)
+
+target_compile_options(${PROJECT_NAME}.elf
+    PRIVATE
+    ${COMMON_C_FLAGS}
+)
+
+target_compile_definitions(${PROJECT_NAME}.elf
+    PRIVATE
+    ${COMMON_DEFINES}
+)
+
+target_include_directories(${PROJECT_NAME}.elf
+    PRIVATE
+    ${COMMON_INCLUDES}
+    ${CMAKE_SOURCE_DIR}/STM32/STM32F4xx_StdPeriph_Driver/inc
+    ${CMAKE_SOURCE_DIR}/lvgl
 )
 
 target_link_libraries(${PROJECT_NAME}.elf freertos_config freertos_kernel)

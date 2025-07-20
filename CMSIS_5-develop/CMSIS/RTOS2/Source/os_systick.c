@@ -22,11 +22,12 @@
  * limitations under the License.
  */
 
+#include "stm32f4xx.h"
+#include "cmsis_compiler.h"
+#include "core_cm4.h"
 #include "os_tick.h"
 
 //lint -emacro((923,9078),SCB,SysTick) "cast from unsigned long to pointer"
-#include "RTE_Components.h"
-#include CMSIS_device_header
 
 #ifdef  SysTick
 

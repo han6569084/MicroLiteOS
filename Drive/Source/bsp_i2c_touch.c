@@ -17,6 +17,7 @@
 
 #include "bsp_i2c_touch.h"
 #include "bsp_touch_gtxx.h"
+#include "stm32f4xx_i2c.h"
 
 /* STM32 I2C 快速模式 */
 #define I2C_Speed              100000
