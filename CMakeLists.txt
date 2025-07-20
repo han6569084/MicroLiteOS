@@ -86,7 +86,10 @@ set(STARTUP startup/startup_stm32f429xx.s)
 # 应用层源文件
 file(GLOB_RECURSE APP_SRC
     "Application/*.c"
-    "Application/led/*.c"
+)
+
+file(GLOB_RECURSE COMPONENTS_SRC
+    "cm_backtrace/*.c"
 )
 
 # 外设驱动（Drive/Source）
@@ -114,6 +117,7 @@ file(GLOB_RECURSE STD_PERIPH_SRC
 set(SOURCES
     ${STARTUP}
     ${APP_SRC}
+    ${COMPONENTS_SRC}
     ${DRIVER_SRC}
     ${STD_PERIPH_SRC}
 )
@@ -155,6 +159,7 @@ target_include_directories(${PROJECT_NAME}.elf
     ${COMMON_INCLUDES}
     ${CMAKE_SOURCE_DIR}/STM32/STM32F4xx_StdPeriph_Driver/inc
     ${CMAKE_SOURCE_DIR}/lvgl
+    ${CMAKE_SOURCE_DIR}/cm_backtrace
 )
 
 target_link_libraries(${PROJECT_NAME}.elf freertos_config freertos_kernel)

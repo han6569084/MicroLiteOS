@@ -106,6 +106,14 @@ LoopFillZerobss:
   bx  lr
 .size  Reset_Handler, .-Reset_Handler
 
+
+.global HardFault_Handler
+.type HardFault_Handler, %function
+HardFault_Handler:
+    MOV     r0, lr                  /* get lr */
+    MOV     r1, sp                  /* get stack pointer (current is MSP) */
+    BL      cm_backtrace_fault
+
 /**
  * @brief  This is the code that gets called when the processor receives an
  *         unexpected interrupt.  This simply enters an infinite loop, preserving
@@ -253,8 +261,8 @@ g_pfnVectors:
    .weak      NMI_Handler
    .thumb_set NMI_Handler,Default_Handler
 
-   .weak      HardFault_Handler
-   .thumb_set HardFault_Handler,Default_Handler
+  @  .weak      HardFault_Handler
+  @  .thumb_set HardFault_Handler,Default_Handler
 
    .weak      MemManage_Handler
    .thumb_set MemManage_Handler,Default_Handler

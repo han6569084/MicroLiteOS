@@ -16,27 +16,21 @@ volatile uint8_t dma_busy = 0;
 #define STDERR_FILENO 2
 #endif
 
-// ������usart IO�ڳ�ʼ��
-//
 void  USART_GPIO_Config	(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_AHB1PeriphClockCmd ( USART6_TX_CLK|USART6_RX_CLK, ENABLE); 	//IO��ʱ������
+	RCC_AHB1PeriphClockCmd ( USART6_TX_CLK|USART6_RX_CLK, ENABLE);
 
-	//IO����
-	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;   	 //����ģʽ
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;   //����
-	GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;		 //����
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; //�ٶȵȼ�
+	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 
-	//��ʼ�� TX	����
 	GPIO_InitStructure.GPIO_Pin = USART6_TX_PIN;
 	GPIO_Init(USART6_TX_PORT, &GPIO_InitStructure);
-	//��ʼ�� RX ����
 	GPIO_InitStructure.GPIO_Pin = USART6_RX_PIN;
 	GPIO_Init(USART6_RX_PORT, &GPIO_InitStructure);
 
-	//IO���ã����õ�USART1
 	GPIO_PinAFConfig(USART6_TX_PORT,USART6_TX_PinSource,GPIO_AF_USART6);
 	GPIO_PinAFConfig(USART6_RX_PORT,USART6_RX_PinSource,GPIO_AF_USART6);
 }
@@ -101,9 +95,6 @@ void DMA_USART1_TX_Init(uint8_t *buf, uint16_t len)
     DMA_Cmd(DMA2_Stream7, ENABLE);
 }
 
-
-// ������USART �ڳ�ʼ��
-//
 void Usart_Config(void)
 {
 	USART_InitTypeDef USART_InitStructure;
@@ -168,7 +159,6 @@ int fputc(int c, FILE *fp)
 
 int fputc_bak(int c, FILE *fp)
 {
-
 	while (dma_busy);
 
     dma_tx_buf[dma_tx_len++] = c;
@@ -180,4 +170,3 @@ int fputc_bak(int c, FILE *fp)
 
 	return (c);
 }
-

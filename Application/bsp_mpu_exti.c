@@ -1,33 +1,14 @@
-/**
-  ******************************************************************************
-  * @file    bsp_exti.c
-  * @author  fire
-  * @version V1.0
-  * @date    2013-xx-xx
-  * @brief   �����������ж�����
-  ******************************************************************************
-  * @attention
-  *
-  * ʵ��ƽ̨:Ұ��  STM32 F429 ������
-  * ��̳    :http://www.firebbs.cn
-  * �Ա�    :https://fire-stm32.taobao.com
-  *
-  ******************************************************************************
-  */
-
 #include "bsp_mpu_exti.h"
 
 static void NVIC_Configuration(void)
 {
   NVIC_InitTypeDef NVIC_InitStructure;
 
-  /* �����ж�Դ */
   NVIC_InitStructure.NVIC_IRQChannel = MPU_INT_EXTI_IRQ;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
-
 }
 
 void EXTI_MPU_Config(void)

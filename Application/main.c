@@ -1,5 +1,5 @@
 #include "stm32f4xx.h"
-#include "./led/bsp_led.h"
+#include "bsp_led.h"
 #include "i2c.h"
 #include "bsp_mpu_exti.h"
 #include "usart.h"
@@ -56,17 +56,17 @@ void vApplicationMallocFailedHook( void )
     }
 #endif
 
-void HardFault_Handler(void)
-{
-    __asm volatile
-    (
-        "TST lr, #4                        \n"
-        "ITE EQ                            \n"
-        "MRSEQ r0, MSP                     \n"
-        "MRSNE r0, PSP                     \n"
-        "B HardFault_Handler_C             \n"
-    );
-}
+// void HardFault_Handler(void)
+// {
+//     __asm volatile
+//     (
+//         "TST lr, #4                        \n"
+//         "ITE EQ                            \n"
+//         "MRSEQ r0, MSP                     \n"
+//         "MRSNE r0, PSP                     \n"
+//         "B HardFault_Handler_C             \n"
+//     );
+// }
 
 void HardFault_Handler_C(uint32_t *hardfault_args)
 {

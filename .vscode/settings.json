@@ -43,7 +43,8 @@
         "cmsis_os2.h": "c",
         "semphr.h": "c",
         "usart.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "freertos.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }

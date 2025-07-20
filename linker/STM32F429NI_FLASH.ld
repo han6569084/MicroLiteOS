@@ -32,6 +32,7 @@ ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
 _estack = _stack_end;    /* end of RAM */
+_sstack = _stack_start;
 
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x2500;      /* required amount of heap  */
@@ -61,6 +62,7 @@ SECTIONS
   .text :
   {
     . = ALIGN(4);
+    _stext = .;         /* define a global symbol at code start */
     *(.text)           /* .text sections (code) */
     *(.text*)          /* .text* sections (code) */
     *(.glue_7)         /* glue arm to thumb code */
@@ -71,7 +73,7 @@ SECTIONS
     KEEP (*(.fini))
 
     . = ALIGN(4);
-    _etext = .;        /* define a global symbols at end of code */
+    _etext = .;        /* define a global symbol at end of code */
   } >FLASH
 
   /* Constant data goes into FLASH */
@@ -172,6 +174,7 @@ SECTIONS
 } >RAM
 
 /* 修改2：确保_estack指向对齐后的栈顶 */
+_sstack = _stack_start;
 _estack = _stack_end;       /* 明确定义栈顶 */
 
   /* User_heap_stack section, used to check that there is enough RAM left */

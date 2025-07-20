@@ -1,0 +1,15 @@
+# Ignore build output directories
+build/out/
+
+# Ignore object files
+*.obj
+
+# Other common ignores
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+*.log
+*.d
+*.dep
