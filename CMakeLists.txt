@@ -109,6 +109,7 @@ file(GLOB_RECURSE STD_PERIPH_SRC
     "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_ltdc.c"
     "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_syscfg.c"
     "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dma2d.c"
+    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_tim.c"
     "STM32/STM32F4xx_StdPeriph_Driver/src/misc.c"
 )
 

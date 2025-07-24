@@ -60,7 +60,7 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 #define STM32F4
 void lv_draw_dma2d_init(void)
 {
-    printf("Initializing DMA2D...\r\n");
+    //printf("Initializing DMA2D...\r\n");
     lv_draw_dma2d_unit_t * draw_dma2d_unit = lv_draw_create_unit(sizeof(lv_draw_dma2d_unit_t));
     draw_dma2d_unit->base_unit.evaluate_cb = evaluate_cb;
     draw_dma2d_unit->base_unit.dispatch_cb = dispatch_cb;
@@ -91,7 +91,7 @@ void lv_draw_dma2d_init(void)
 
     /* enable the interrupt */
     NVIC_EnableIRQ(DMA2D_IRQn);
-    printf("DMA2D_IRQn = %d, IP = %d\r\n", DMA2D_IRQn, NVIC->IP[DMA2D_IRQn]);
+    //printf("DMA2D_IRQn = %d, IP = %d\r\n", DMA2D_IRQn, NVIC->IP[DMA2D_IRQn]);
 }
 
 void lv_draw_dma2d_deinit(void)
@@ -162,14 +162,14 @@ uint32_t lv_draw_dma2d_color_to_dma2d_color(lv_draw_dma2d_output_cf_t cf, lv_col
 
 void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf)
 {
-    printf("Configuring DMA2D transfer...\r\n");
+    //printf("Configuring DMA2D transfer...\r\n");
 
     /* number of lines register */
     // DMA2D->NLR = (conf->w << DMA2D_NLR_PL) | (conf->h << DMA2D_NLR_NL);
     DMA2D->NLR = ((conf->w & 0x3FFF) << 16) | (conf->h & 0xFFFF);
 
-    printf("conf = %d %d\r\n", conf->w, conf->h);
-    printf("DMA2D->NLR=0x%08lx\r\n", DMA2D->NLR);
+    //printf("conf = %d %d\r\n", conf->w, conf->h);
+    //printf("DMA2D->NLR=0x%08lx\r\n", DMA2D->NLR);
 
     /* output */
 
@@ -348,15 +348,15 @@ static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_dma2d_unit_t * draw_dma2d_unit = (lv_draw_dma2d_unit_t *) draw_unit;
-    printf("Dispatching draw task to draw unit %p\r\n", draw_unit);
+    //printf("Dispatching draw task to draw unit %p\r\n", draw_unit);
     if(draw_dma2d_unit->task_act) {
 #if LV_DRAW_DMA2D_ASYNC
         /*Return immediately if it's busy with draw task*/
-        printf("0\r\n");
+        //printf("0\r\n");
         return 0;
 #else
         if(!check_transfer_completion()) {
-            printf("1");
+            //printf("1");
             return LV_DRAW_UNIT_IDLE;
         }
         post_transfer_tasks(draw_dma2d_unit);
@@ -365,26 +365,26 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_DMA2D);
     if(t == NULL) {
-        printf("2");
+        //printf("2");
         return LV_DRAW_UNIT_IDLE;
     }
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) {
-        printf("3");
+        //printf("3");
         return LV_DRAW_UNIT_IDLE;
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     t->draw_unit = draw_unit;
     draw_dma2d_unit->task_act = t;
-    printf("DMA2D task_act %p is now active.\r\n", t);
+    //printf("DMA2D task_act %p is now active.\r\n", t);
     if(t->type == LV_DRAW_TASK_TYPE_FILL) {
         lv_draw_fill_dsc_t * dsc = t->draw_dsc;
         const lv_area_t * coords = &t->area;
         lv_area_t clipped_coords;
         if(!lv_area_intersect(&clipped_coords, coords, &t->clip_area)) {
-            printf("4");
+            //printf("4");
             return LV_DRAW_UNIT_IDLE;
         }
 
@@ -412,7 +412,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         const lv_area_t * coords = &t->area;
         lv_area_t clipped_coords;
         if(!lv_area_intersect(&clipped_coords, coords, &t->clip_area)) {
-            printf("5");
+            //printf("5");
             return LV_DRAW_UNIT_IDLE;
         }
 
@@ -457,15 +457,15 @@ static void thread_cb(void * arg)
 
     while(1) {
 
-        printf("DMA2D thread waiting for tasks...\r\n");
+        //printf("DMA2D thread waiting for tasks...\r\n");
         do {
             lv_thread_sync_wait(&u->interrupt_signal);
-            printf("DMA2D thread woke up.\r\n");
-        } while(u->task_act != NULL);
-        printf("DMA2D thread got a task to process.\r\n");
+            //printf("DMA2D thread woke up.\r\n");
+        } while(u->task_act == NULL);
+        //printf("DMA2D thread got a task to process.\r\n");
         post_transfer_tasks(u);
         lv_draw_dispatch_request();
-        printf("DMA2D thread finished processing a task.\r\n");
+        //printf("DMA2D thread finished processing a task.\r\n");
     }
 }
 #endif
@@ -484,7 +484,7 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u)
 #endif
     u->task_act->state = LV_DRAW_TASK_STATE_READY;
     u->task_act = NULL;
-    printf("DMA2D transfer completed, u->task_act = NULL.\r\n");
+    //printf("DMA2D transfer completed, u->task_act = NULL.\r\n");
 }
 
 #endif /*LV_USE_DRAW_DMA2D*/

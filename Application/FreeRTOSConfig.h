@@ -55,7 +55,7 @@
 //  <o>Total heap size [bytes] <0-0xFFFFFFFF>
 //  <i> Heap memory size in bytes.
 //  <i> Default: 8192
-#define configTOTAL_HEAP_SIZE                     ((size_t)8192*1024)
+#define configTOTAL_HEAP_SIZE                     ((size_t)8 * 1024 * 1024)
 
 //  <o>Kernel tick frequency [Hz] <0-0xFFFFFFFF>
 //  <i> Kernel tick rate in Hz.
@@ -70,7 +70,7 @@
 //  <o>Timer task priority <0-56>
 //  <i> Timer task priority.
 //  <i> Default: 40 (High)
-#define configTIMER_TASK_PRIORITY                 40
+#define configTIMER_TASK_PRIORITY                 55
 
 //  <o>Timer queue length <0-1024>
 //  <i> Timer command queue length.

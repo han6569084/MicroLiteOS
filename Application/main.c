@@ -18,6 +18,7 @@
 #include "stm32f4xx_dma2d.h"
 #include "misc.h"
 #include "../lvgl/src/draw/dma2d/lv_draw_dma2d.h"
+#include "cm_backtrace.h"
 
 /* Standard includes. */
 #include <stdio.h>
@@ -115,14 +116,14 @@ volatile uint64_t s_timeLeft = 0;
 
 void EXTI_Config()
 {
-	EXTI_InitTypeDef EXTI_InitStruct;
-	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
-	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStruct.EXTI_Line = EXTI_Line13;
-	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource13);
-	EXTI_Init(&EXTI_InitStruct);
+    EXTI_InitTypeDef EXTI_InitStruct;
+    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStruct.EXTI_Line = EXTI_Line13;
+    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource13);
+    EXTI_Init(&EXTI_InitStruct);
 }
 
 #define SHT4x_ADDR              0x88
@@ -258,7 +259,7 @@ ERROR_NACK:
 
 void gyro_data_ready_cb(void)
 {
-	s_ledColor++;
+    s_ledColor++;
 }
 
 void SHT4x_DMA_Init(void)
@@ -397,133 +398,75 @@ ErrorStatus SHT4x_ReadHighPrecision(float *temperature, float *humidity)
     // return SHT4x_ReadTempHumid(temperature, humidity, HIGH_PRECISION_CMD);
 }
 
-#if 0
-static void sysCoreTask( void * argument );
-// 8x16点阵“H”字，RGB565格式，白底黑字
-const uint16_t hello_bitmap_write[16][8] = {
-    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}, // 第一行
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000}, // 第二行
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000}, // ...
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0xFFFF,0xFFFF,0x0000,0xFFFF,0xFFFF,0x0000,0x0000},
-    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}
-};
-
-const uint16_t hello_bitmap_red[16][8] = {
-    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0xF800,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0xF800,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0xF800,0xF800,0x0000,0xF800,0xF800,0x0000,0x0000},
-    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}
-};
-
-const uint16_t hello_bitmap_blue[16][8] = {
-    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x001F,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x001F,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x001F,0x001F,0x0000,0x001F,0x001F,0x0000,0x0000},
-    {0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}
-};
-void LCD_DrawBitmap_Center(const uint16_t *bitmap, uint16_t bmp_w, uint16_t bmp_h)
-{
-    uint16_t *fb = (uint16_t *)LCD_BUFFER;
-    uint16_t x0 = (LCD_PIXEL_WIDTH - bmp_w) / 2;
-    uint16_t y0 = (LCD_PIXEL_HEIGHT - bmp_h) / 2;
-
-    for (uint16_t y = 0; y < bmp_h; y++) {
-        for (uint16_t x = 0; x < bmp_w; x++) {
-            fb[(y0 + y) * LCD_PIXEL_WIDTH + (x0 + x)] = bitmap[y * bmp_w + x];
-        }
-    }
-}
-
-static void lcdTestTask( void * argument )
-{
-    printf("lcdTestTask start\r\n");
-    int i = 0;
-    while (1)
-    {
-        printf("start test\r\n");
-        if (i % 3 == 0) {
-            LCD_DrawBitmap_Center((const uint16_t *)hello_bitmap_write, 8, 16);
-            printf("hello_bitmap_write\r\n");
-        } else if (i % 3 == 1) {
-            LCD_DrawBitmap_Center((const uint16_t *)hello_bitmap_red, 8, 16);
-            printf("hello_bitmap_red\r\n");
-        } else if (i % 3 == 2) {
-            LCD_DrawBitmap_Center((const uint16_t *)hello_bitmap_blue, 8, 16);
-            printf("hello_bitmap_blue\r\n");
-        }
-
-        osDelay(1000);
-        i++;
-        printf("test end\r\n");
-    }
-}
-#endif
-
 void DMA2D_IRQHandler(void)
 {
     printf("DMA2D_IRQHandler called\r\n");
-    printf("DMA2D_IRQHandler priority: %d\r\n", NVIC->IP[90]);
-    DMA2D_ClearFlag(DMA2D_FLAG_TC | DMA2D_FLAG_TW | DMA2D_FLAG_CE | DMA2D_FLAG_TE);
-    lv_draw_dma2d_transfer_complete_interrupt_handler();
+    // printf("DMA2D_IRQHandler priority: %d\r\n", NVIC->IP[90]);
+    // DMA2D_ClearFlag(DMA2D_FLAG_TC | DMA2D_FLAG_TW | DMA2D_FLAG_CE | DMA2D_FLAG_TE);
+    // lv_draw_dma2d_transfer_complete_interrupt_handler();
+    while (1)
+    {
+
+    }
 }
 
-static lv_draw_buf_t draw_buf;
-static lv_color_t *lvgl_buf1 = (lv_color_t *)LCD_BUFFER; // 直接用 FrameBuffer
 
+static lv_draw_buf_t draw_buf;
+// 真双缓冲 FrameBuffer 地址由驱动统一定义和管理，直接通过 getter 获取
+// FrameBuffer1/2 地址定义见 bsp_lcd.c
+static lv_color_t *lvgl_buf1 = (lv_color_t *)0xd0000000; // 备份/渲染 Buffer
+static lv_color_t *lvgl_buf2 = (lv_color_t *)0xd0200000; // 显示 Buffer
+
+// 交替渲染用静态变量
+static uint8_t s_fb_index = 0;
+volatile uint8_t s_lcd_busy = 0;
+/*
+ * 真正无撕裂双缓冲 LVGL flush_cb 实现：
+ * 1. LVGL 渲染始终写入当前“备份”Buffer（lvgl_buf1），显示端始终显示“主”Buffer（lvgl_buf2）。
+ * 2. 每次 flush_cb 被 LVGL 调用时，交替切换 lvgl_buf1/lvgl_buf2 指针（即 FrameBuffer1/2 角色），
+ *    并调用 LCD_SetFrameBuffer() 通知驱动切换物理地址，等待 LTDC 帧中断完成物理切换。
+ * 3. flush_cb 只需调用 lv_display_flush_ready()，无需 memcpy，驱动帧中断自动切换显示。
+ * 4. 需保证 FrameBuffer1/2 地址与驱动一致，且 LCD_SetFrameBuffer/FrameCallback 正确实现。
+ * 5. 典型流程：
+ *    - LVGL 渲染到“备份”Buffer（lvgl_buf1）
+ *    - flush_cb 交替切换 lvgl_buf1/lvgl_buf2，调用 LCD_SetFrameBuffer(显示 Buffer)
+ *    - LTDC 帧中断回调 FrameCallback，通知 LVGL 渲染下一帧
+ */
 static void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
-    printf("my_flush_cb called\r\n");
-    lv_color_t *fb = (lv_color_t *)LCD_BUFFER;
-    for(int y = area->y1; y <= area->y2; y++) {
-        memcpy(
-            &fb[y * LCD_PIXEL_WIDTH + area->x1],
-            color_p,
-            (area->x2 - area->x1 + 1) * sizeof(lv_color_t)
-        );
-        color_p += (area->x2 - area->x1 + 1) * sizeof(lv_color_t);
+    // if(area->x1 == 0 && area->y1 == 0 && area->x2 == LCD_PIXEL_WIDTH-1 && area->y2 == LCD_PIXEL_HEIGHT-1) {
+    // }
+    // else {
+    //     return;
+    // }
+    while(s_lcd_busy) { osDelay(1); }
+    s_lcd_busy = 1;
+    // 只支持全屏刷新，area 检查可选
+    // 交替切换 FrameBuffer1/2
+    s_fb_index ^= 1;
+    extern uint32_t LCD_GetFrameBuffer1(void);
+    extern uint32_t LCD_GetFrameBuffer2(void);
+    extern void LCD_SetFrameBuffer(uint32_t fb_addr);
+    if(s_fb_index == 0) {
+        lvgl_buf1 = (lv_color_t *)LCD_GetFrameBuffer1();
+        lvgl_buf2 = (lv_color_t *)LCD_GetFrameBuffer2();
+    } else {
+        lvgl_buf1 = (lv_color_t *)LCD_GetFrameBuffer2();
+        lvgl_buf2 = (lv_color_t *)LCD_GetFrameBuffer1();
     }
+    memcpy(lvgl_buf1, lvgl_buf2, LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * sizeof(lv_color16_t));
+    // 每次切换后，重新设置 LVGL 渲染 Buffer，确保双缓冲生效
+    lv_display_set_buffers(disp, lvgl_buf1, NULL, LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * sizeof(lv_color16_t), LV_DISPLAY_RENDER_MODE_DIRECT);
+    // 通知驱动切换显示 Buffer
+    LCD_SetFrameBuffer((uint32_t)lvgl_buf2);
+    // LVGL 渲染下一帧前，flush_ready
     lv_display_flush_ready(disp);
 }
 
 static void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data)
 {
     volatile int x = 0, y = 0;
-    printf("my_touchpad_read called\r\n");
+    // printf("my_touchpad_read called\r\n");
     GTP_Execu(&x, &y);
     if (x > 0 && y > 0) {
         data->point.x = x;
@@ -532,11 +475,12 @@ static void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data)
     } else {
         data->state = LV_INDEV_STATE_RELEASED;
     }
-    printf("Touch at (%d, %d), state: %d\r\n", data->point.x, data->point.y, data->state);
+    // printf("Touch at (%d, %d), state: %d\r\n", data->point.x, data->point.y, data->state);
 }
 
-void hal_init(void)
+static void hal_init(void)
 {
+    // 使用双FrameBuffer，lvgl_buf1为渲染Buffer，lvgl_buf2为显示Buffer
     lv_draw_buf_init(
         &draw_buf,
         LCD_PIXEL_WIDTH,
@@ -544,36 +488,66 @@ void hal_init(void)
         LV_COLOR_FORMAT_NATIVE,
         LCD_PIXEL_WIDTH,
         lvgl_buf1,
-        LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * sizeof(lv_color_t)
+        LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * sizeof(lv_color16_t)
     );
 
     lv_display_t *disp = lv_display_create(LCD_PIXEL_WIDTH, LCD_PIXEL_HEIGHT);
+    lv_display_set_default(disp);
     lv_display_set_flush_cb(disp, my_flush_cb);
-    lv_display_set_buffers(disp, lvgl_buf1, NULL, LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * sizeof(lv_color_t), LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_buffers(disp, lvgl_buf1, NULL, LCD_PIXEL_WIDTH * LCD_PIXEL_HEIGHT * sizeof(lv_color16_t), LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
 
-    lv_indev_t *touchpad_indev = lv_indev_create();
-    if (touchpad_indev == NULL) {
-        printf("lv_indev_create failed\r\n");
-        return;
-    }
+    // lv_indev_t *touchpad_indev = lv_indev_create();
+    // if (touchpad_indev == NULL) {
+    //     printf("lv_indev_create failed\r\n");
+    //     return;
+    // }
 
-    lv_indev_set_type(touchpad_indev, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(touchpad_indev, my_touchpad_read);
+    // lv_indev_set_type(touchpad_indev, LV_INDEV_TYPE_POINTER);
+    // lv_indev_set_read_cb(touchpad_indev, my_touchpad_read);
 
-    lv_indev_set_mode(touchpad_indev, LV_INDEV_MODE_TIMER);
-    lv_indev_enable(touchpad_indev, true);
+    // lv_indev_set_mode(touchpad_indev, LV_INDEV_MODE_TIMER);
+    // lv_indev_enable(touchpad_indev, true);
     printf("lv_indev_create success\r\n");
 }
 
 void lvglTimerCb (void *argument)
 {
-    lv_tick_inc(5);
+    lv_tick_inc(10);
 }
+
+lv_obj_t *label = NULL;
+// Timer callback to update label text and red area color
+static void lvgl_update_cb(lv_timer_t * timer)
+{
+    static uint32_t cnt = 0;
+    static uint32_t color = 0xFF0000;
+    lv_obj_t *red_area = lv_obj_get_parent(label);
+    char buf[32];
+    cnt++;
+    // Cycle color: red -> green -> blue -> red ...
+    uint32_t color_tmp = 0;
+    switch(cnt / 20 % 3) {
+        case 0: color_tmp = 0xFF0000; break;
+        case 1: color_tmp = 0x00FF00; break;
+        case 2: color_tmp = 0x0000FF; break;
+    }
+    // color_tmp = 0xFFFFFF;
+    if (color_tmp != color) {
+        color = color_tmp;
+        lv_obj_set_style_bg_color(red_area, lv_color_hex(color), 0);
+    }
+
+    snprintf(buf, sizeof(buf), "LVGL Timer: %lu", (unsigned long)cnt);
+    lv_label_set_text(label, buf);
+    lv_obj_center(label);
+
+    LCD_SetBacklight(cnt % 10 * 10); // 模拟背光亮度变化
+}
+
 
 static void lvglGuiTask( void * argument )
 {
-
     LCD_Init(LCD_BUFFER, 0, LTDC_Pixelformat_RGB565);
     GTP_Init_Panel();
 
@@ -584,14 +558,31 @@ static void lvglGuiTask( void * argument )
     /*Initialize the HAL (display, input devices, tick) for LittlevGL*/
     hal_init();
 
-    lv_demo_widgets();
+    // 创建800x400红色区域
+    lv_obj_t *red_area = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(red_area, 800, 480);
+    lv_obj_set_style_bg_color(red_area, lv_color_hex(0xFF0000), 0);
+    lv_obj_center(red_area);
+
+    // 创建label并居中于红色区域
+    label = lv_label_create(red_area);
+    lv_label_set_text(label, "Hello LVGL!");
+    lv_obj_center(label);
+
+    // 创建LVGL定时器，每秒更新label和颜色
+    lv_timer_t *timer = lv_timer_create(lvgl_update_cb, 1000, label);
+    if(timer == NULL) {
+        printf("lv_timer_create failed\r\n");
+    }
+
+    // lv_demo_widgets();
 
     printf("lvglGuiTask start\r\n");
     while (1)
     {
         /*Call the lv_task handler periodically*/
         lv_timer_handler();
-        // osDelay(5);
+        osDelay(10);
     }
 }
 float g_temp = 0.0f;
@@ -602,19 +593,6 @@ static void sysCoreTask( void * argument )
 {
     float temp, humid;
     printf("sysCoreTask start\r\n");
-    osTimerAttr_t attr_timer = {
-        .name = "lvglTimer",
-        .attr_bits = osTimerPeriodic,
-        .cb_mem = NULL,
-        .cb_size = 0
-    };
-    osTimerId_t lvglTimer = osTimerNew(lvglTimerCb, osTimerPeriodic, NULL, &attr_timer);
-    if (lvglTimer == NULL) {
-        printf("osTimerNew failed\r\n");
-    } else {
-        osTimerStart(lvglTimer, 5);
-        printf("osTimerNew success\r\n");
-    }
 
     osThreadAttr_t attr_thread = {
         .name = "lvglGuiTask",
@@ -623,6 +601,16 @@ static void sysCoreTask( void * argument )
     };
     osThreadNew(lvglGuiTask, NULL, &attr_thread);
 
+    osTimerAttr_t attr_timer = {
+        .name = "lvglTimer",
+    };
+    osTimerId_t lvglTimer = osTimerNew(lvglTimerCb, osTimerPeriodic, NULL, &attr_timer);
+    if (lvglTimer == NULL) {
+        printf("osTimerNew failed\r\n");
+    } else {
+        osTimerStart(lvglTimer, 10);
+        printf("osTimerNew success\r\n");
+    }
 
     printf("start measure\r\n");
     while (1)
@@ -651,12 +639,77 @@ static void sysCoreTask( void * argument )
 
 __attribute__((section(".sdram"))) uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
 
+void MPU_Config(void)
+{
+    MPU->CTRL = 0;
+
+    // // SRAM: 0x20000000, 128KB
+    // MPU->RNR = 0;
+    // MPU->RBAR = 0x20000000;
+    // MPU->RASR =
+    //     (0x3 << 24) | // Full access
+    //     (0x0 << 19) | // TEX=0
+    //     (0x1 << 18) | // S=1
+    //     (0x1 << 17) | // C=1
+    //     (0x1 << 16) | // B=1
+    //     (0x10 << 1) | // 128KB (2^(10+1))
+    //     (1 << 0);
+
+    // // FLASH: 0x08000000, 2MB
+    // MPU->RNR = 1;
+    // MPU->RBAR = 0x08000000;
+    // MPU->RASR =
+    //     (0x3 << 24) |
+    //     (0x0 << 19) |
+    //     (0x1 << 18) |
+    //     (0x1 << 17) |
+    //     (0x1 << 16) |
+    //     (0x15 << 1) | // 2MB (2^(21+1))
+    //     (1 << 0);
+
+    // SDRAM: 0xD0000000, 32MB
+    MPU->RNR = 0;
+    MPU->RBAR = 0xD0000000;
+    MPU->RASR =
+        (0x3 << 24) | // Full access
+        (0x1 << 19) | // TEX=1 (strongly recommended for external RAM)
+        (0x1 << 18) | // S=1
+        (0x1 << 17) | // C=1
+        (0x1 << 16) | // B=1
+        (0x18 << 1) | // 32MB (2^(24+1))
+        (1 << 0);
+
+    // // 禁止所有未配置区域（region 7，4GB）
+    // MPU->RNR = 7;
+    // MPU->RBAR = 0x00000000;
+    // MPU->RASR =
+    //     (0x0 << 24) | // No access
+    //     (0x0 << 19) |
+    //     (0x0 << 18) |
+    //     (0x0 << 17) |
+    //     (0x0 << 16) |
+    //     (0x1F << 1) | // 4GB (2^(31+1))
+    //     (1 << 0);
+
+    // 使能MPU，关闭PRIVDEFENA
+    MPU->CTRL = MPU_CTRL_ENABLE_Msk;
+
+    __DSB();
+    __ISB();
+}
+
 int main( void )
 {
     SystemCoreClockUpdate();
+    // 清除SDRAM所有数据，全部置为0
+
+    SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk; // 使能 UsageFault
+    FPU->FPDSCR |= (1 << 8); // 使能分割异常（可选）
+    SCB->CCR |= SCB_CCR_DIV_0_TRP_Msk; // 使能整数除零陷阱（对浮点无效）
     LED_GPIO_Config();
     // KEY_GPIO_Config();
     SDRAM_Init();
+    memset((void *)0xD0000000, 0, 32 * 1024 * 1024); // 32MB SDRAM全部清零
     NVIC_SetPriority(EXTI15_10_IRQn, 5);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
     NVIC_SetPriorityGrouping(0);
@@ -666,6 +719,8 @@ int main( void )
     // I2cMaster_Init();
     // SHT4x_DMA_Init();
     Usart_Config();
+    // MPU_Config();
+    cm_backtrace_init("STM32F429_Project", "v1.0.0", "v1.0.0");
 
     printf("DMA2D_IRQn = %d, IP = %d\r\n", DMA2D_IRQn, NVIC_GetPriority(DMA2D_IRQn));
     ( void ) printf( "sysCoreTask FreeRTOS Project\r\n" );

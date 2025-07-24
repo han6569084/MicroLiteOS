@@ -16,9 +16,79 @@
   */
 
 
+/**
+  ******************************************************************************
+  * @file    bsp_lcd.c
+  * @author  fire
+  * @version V1.1
+  * @date    2015-xx-xx
+  * @brief   LCD驱动函数接口
+  ******************************************************************************
+  * @attention
+  *
+  * 实验平台:野火  STM32 F429 开发板
+  * 论坛    :http://www.firebbs.cn
+  * 淘宝    :https://fire-stm32.taobao.com
+  *
+  ******************************************************************************
+  */
+
+/*
+ * ================== main.c flush_cb 配合说明 ==================
+ * 1. LVGL 渲染始终写入“后备”Buffer（如 FRAMEBUFFER2_ADDR）。
+ * 2. flush_cb 渲染完成后调用 LCD_SetFrameBuffer(后备Buffer地址)，通知LTDC下帧切换。
+ * 3. LTDC 帧中断回调 LCD_FrameCallback()，LTDC 显示Buffer切换到后备Buffer。
+ * 4. 下次LVGL渲染写入另一个Buffer，flush_cb后再切回。
+ * 5. 如此循环，实现真正的无撕裂双缓冲。
+ *
+ * main.c 示例：
+ *   static uint8_t cur_buf = 0;
+ *   static void my_flush_cb(...) {
+ *       uint32_t draw_addr = cur_buf ? LCD_GetFrameBuffer2() : LCD_GetFrameBuffer1();
+ *       // LVGL 渲染到 draw_addr ...
+ *       LCD_SetFrameBuffer(draw_addr);
+ *       cur_buf = !cur_buf;
+ *       lv_display_flush_ready(...);
+ *   }
+ */
+
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_lcd.h"
 #include "stm32f4xx_ltdc.h"
+#include "stm32f4xx.h"
+#include "stdio.h"
+
+#include "stm32f4xx_tim.h"
+
+#define FRAMEBUFFER1_ADDR  ((uint32_t)0xD0000000)
+#define FRAMEBUFFER2_ADDR  ((uint32_t)0xD0200000)
+extern volatile uint8_t s_lcd_busy;
+// 获取FrameBuffer1/2地址，供应用层/flush_cb使用
+uint32_t LCD_GetFrameBuffer1(void) { return FRAMEBUFFER1_ADDR; }
+uint32_t LCD_GetFrameBuffer2(void) { return FRAMEBUFFER2_ADDR; }
+
+// ================== LTDC_IRQHandler 示例实现 ==================
+void LCD_FrameCallback(void);
+// LTDC全局中断处理函数（建议放到 stm32f4xx_it.c 并在启动文件中声明）
+void LTDC_IRQHandler(void)
+{
+    // 检查帧中断标志（Frame Interrupt）
+    if(LTDC->ISR & LTDC_ISR_LIF) {
+        LTDC->ICR = LTDC_ICR_CFUIF; // 清除帧中断标志
+        s_lcd_busy = 0;
+        LCD_FrameCallback();        // 帧切换
+    }
+    // 可选：处理其他中断标志
+    if(LTDC->ISR & LTDC_ISR_FUIF) {
+        LTDC->ICR = LTDC_ICR_CFUIF;
+    }
+    if(LTDC->ISR & LTDC_ISR_TERRIF) {
+        LTDC->ICR = LTDC_ICR_CLIF;
+    }
+    if(LTDC->ISR & LTDC_ISR_LIF) {
+        LTDC->ICR = LTDC_ICR_CLIF;
+    }
+}
 
 /* 不同液晶屏的参数 */
 const LCD_PARAM_TypeDef lcd_param[LCD_TYPE_NUM]={
@@ -99,6 +169,9 @@ const uint8_t PIXEL_BPP[]={4,3,2,2,2,1,1,2};
   * @param  无
   * @retval 无
   */
+static void LCD_PWM_Backlight_Init(void);
+void LCD_SetBacklight(uint8_t percent);
+
 static void LCD_GPIO_Config(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -254,12 +327,30 @@ static void LCD_GPIO_Config(void)
     GPIO_Init(LTDC_DISP_GPIO_PORT, &GPIO_InitStruct);
 
 
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_7;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+
+    GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+#if USE_TIM2_PWM_BACKLIGHT
+    // 配置PB3为TIM2_CH2复用功能，输出PWM
     GPIO_InitStruct.GPIO_Pin = LTDC_BL_GPIO_PIN;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(LTDC_BL_GPIO_PORT, &GPIO_InitStruct);
+    GPIO_PinAFConfig(LTDC_BL_GPIO_PORT, LTDC_BL_PINSOURCE, GPIO_AF_TIM2);
+    LCD_PWM_Backlight_Init();
+#endif
 
     //拉高使能lcd
     GPIO_SetBits(LTDC_DISP_GPIO_PORT,LTDC_DISP_GPIO_PIN);
-    GPIO_SetBits(LTDC_BL_GPIO_PORT,LTDC_BL_GPIO_PIN);
+    // 背光初始由PWM控制
+
 }
 
 /**
@@ -267,12 +358,66 @@ static void LCD_GPIO_Config(void)
  * @param  on 1为亮，其余值为灭
  * @retval 无
  */
+// 兼容旧接口，on=1为100%，on=0为0%
 void LCD_BackLed_Control ( int on )
 {
-    if ( on )
-        GPIO_SetBits(LTDC_BL_GPIO_PORT,LTDC_BL_GPIO_PIN);
+    if (on)
+        LCD_SetBacklight(50);
     else
-        GPIO_ResetBits(LTDC_BL_GPIO_PORT,LTDC_BL_GPIO_PIN);
+        LCD_SetBacklight(0);
+}
+
+
+// TIM2_CH2 (PB3) 作为PWM背光输出
+#define LCD_PWM_TIM                TIM2
+#define LCD_PWM_TIM_CLK            RCC_APB1Periph_TIM2
+#define LCD_PWM_TIM_CLK_INIT       RCC_APB1PeriphClockCmd
+#define LCD_PWM_PERIOD             999
+#define LCD_PWM_PRESCALER          83  // 84MHz/84=1MHz, 1MHz/1000=1kHz
+#define LCD_PWM_CHANNEL            TIM_Channel_2
+
+static void LCD_PWM_Backlight_Init(void)
+{
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+    TIM_OCInitTypeDef TIM_OCInitStructure;
+
+    LCD_PWM_TIM_CLK_INIT(LCD_PWM_TIM_CLK, ENABLE);
+
+    TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+    TIM_TimeBaseStructure.TIM_Period = LCD_PWM_PERIOD;
+    TIM_TimeBaseStructure.TIM_Prescaler = LCD_PWM_PRESCALER;
+    TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseInit(LCD_PWM_TIM, &TIM_TimeBaseStructure);
+
+    TIM_OCStructInit(&TIM_OCInitStructure);
+    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+    TIM_OCInitStructure.TIM_Pulse = 50; // 默认50%亮度
+    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+
+    TIM_OC2Init(LCD_PWM_TIM, &TIM_OCInitStructure);
+    TIM_OC2PreloadConfig(LCD_PWM_TIM, TIM_OCPreload_Enable);
+
+    TIM_ARRPreloadConfig(LCD_PWM_TIM, ENABLE);
+    TIM_Cmd(LCD_PWM_TIM, ENABLE);
+}
+
+// 设置背光亮度百分比（0~100）
+void LCD_SetBacklight(uint8_t percent)
+{
+#if USE_TIM2_PWM_BACKLIGHT
+    if(percent > 100) percent = 100;
+    uint16_t ccr = (LCD_PWM_PERIOD + 1) * percent / 100;
+    TIM_SetCompare2(LCD_PWM_TIM, ccr);
+#else
+    // 直接控制GPIO输出高低电平
+    if(percent > 0) {
+        GPIO_SetBits(LTDC_BL_GPIO_PORT, LTDC_BL_GPIO_PIN); // 背光亮
+    } else {
+        GPIO_ResetBits(LTDC_BL_GPIO_PORT, LTDC_BL_GPIO_PIN); // 背光灭
+    }
+#endif
 }
 
 /**
@@ -282,6 +427,27 @@ void LCD_BackLed_Control ( int on )
            如LTDC_Pixelformat_ARGB8888 、LTDC_Pixelformat_RGB565等
   * @retval None
   */
+static uint32_t s_lcd_fb_addr = 0; // 当前显示的FrameBuffer地址
+static uint32_t s_lcd_fb_addr_next = 0; // 下一个待切换的FrameBuffer地址
+
+// 切换FrameBuffer地址，下一帧生效
+void LCD_SetFrameBuffer(uint32_t fb_addr)
+{
+    s_lcd_fb_addr_next = fb_addr;
+}
+
+// 在LTDC帧中断中调用，完成FrameBuffer切换
+void LCD_FrameCallback(void)
+{
+    // printf("LCD_FrameCallback\r\n");
+    // 如果有下一个待
+    if(s_lcd_fb_addr_next && s_lcd_fb_addr_next != s_lcd_fb_addr) {
+        LTDC_Layer1->CFBAR = s_lcd_fb_addr_next;
+        LTDC_ReloadConfig(LTDC_VBReload); // VBlank期间切换
+        s_lcd_fb_addr = s_lcd_fb_addr_next;
+    }
+}
+
 void LCD_LayerInit(uint32_t fb_addr, uint32_t pixel_format )
 {
     LTDC_Layer_InitTypeDef LTDC_Layer_InitStruct;
@@ -325,6 +491,8 @@ void LCD_LayerInit(uint32_t fb_addr, uint32_t pixel_format )
 
     /* 配置本层的显存首地址 */
     LTDC_Layer_InitStruct.LTDC_CFBStartAdress = fb_addr;
+    s_lcd_fb_addr = fb_addr;
+    s_lcd_fb_addr_next = fb_addr;
 
     /* 以上面的配置初始化第 1 层*/
     LTDC_LayerInit(LTDC_Layer1, &LTDC_Layer_InitStruct);
@@ -350,7 +518,9 @@ void LCD_LayerInit(uint32_t fb_addr, uint32_t pixel_format )
   * @param pixel_format 像素格式，如LTDC_Pixelformat_ARGB8888 、LTDC_Pixelformat_RGB565等
   * @retval  None
   */
+// LCD初始化，fb_addr为初始FrameBuffer
 void LCD_Init(uint32_t fb_addr, int lcd_clk_mhz, uint32_t pixel_format )
+// 用户需在中断文件 stm32f4xx_it.c 中的 LTDC_IRQHandler 或 DMA2D/LTDC 帧中断中调用 LCD_FrameCallback()
 {
   uint32_t div;
   LTDC_InitTypeDef       LTDC_InitStruct;
@@ -379,20 +549,20 @@ void LCD_Init(uint32_t fb_addr, int lcd_clk_mhz, uint32_t pixel_format )
   /* 使能DMA2D时钟 */
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2D, ENABLE);
 
-	/* 初始化LCD的控制引脚 */
+  /* 初始化LCD的控制引脚 */
   LCD_GPIO_Config();
 
-	/* 配置 PLLSAI 分频器，它的输出作为像素同步时钟CLK*/
+  /* 配置 PLLSAI 分频器，它的输出作为像素同步时钟CLK*/
   /* PLLSAI_VCO 输入时钟 = HSE_VALUE/PLL_M = 1 Mhz */
   /* PLLSAI_VCO 输出时钟 = PLLSAI_VCO输入 * PLLSAI_N = 420 Mhz */
   /* PLLLCDCLK = PLLSAI_VCO 输出/PLLSAI_R = 420/div  Mhz */
   /* LTDC 时钟频率 = PLLLCDCLK / DIV = 420/div/4 = PIXEL_CLK_MHZ Mhz */
-	/* LTDC时钟太高会导花屏，若对刷屏速度要求不高，降低时钟频率可减少花屏现象*/
-	/* 以下函数三个参数分别为：PLLSAIN,PLLSAIQ,PLLSAIR，其中PLLSAIQ与LTDC无关*/
+  /* LTDC时钟太高会导花屏，若对刷屏速度要求不高，降低时钟频率可减少花屏现象*/
+  /* 以下函数三个参数分别为：PLLSAIN,PLLSAIQ,PLLSAIR，其中PLLSAIQ与LTDC无关*/
   div = 420/4/lcd_clk_mhz;
 
   RCC_PLLSAIConfig(420,7,div);
-	/*以下函数的参数为DIV值*/
+  /*以下函数的参数为DIV值*/
   RCC_LTDCCLKDivConfig(RCC_PLLSAIDivR_Div4);
 
   /* 使能 PLLSAI 时钟 */
@@ -441,6 +611,10 @@ void LCD_Init(uint32_t fb_addr, int lcd_clk_mhz, uint32_t pixel_format )
   LTDC_Cmd(ENABLE);
 
   LCD_LayerInit(fb_addr, pixel_format);
+
+  // 使能LTDC帧中断（LIF）
+  LTDC->IER |= LTDC_IER_LIE;
+  NVIC_EnableIRQ(LTDC_IRQn);
 }
 
 void LCD_LayerCamInit(uint32_t Addr, uint32_t width, uint32_t high)

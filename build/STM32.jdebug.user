@@ -1,22 +1,38 @@
 
+Breakpoint=/home/hanzhijian/workspace/stm32/Application/main.c:534, State=BP_STATE_ON
+Breakpoint=/home/hanzhijian/workspace/stm32/Application/main.c:539, State=BP_STATE_ON
+OpenDocument="lv_timer.c", FilePath="/home/hanzhijian/workspace/stm32/lvgl/src/misc/lv_timer.c", Line=283
+OpenDocument="lv_refr.c", FilePath="/home/hanzhijian/workspace/stm32/lvgl/src/core/lv_refr.c", Line=358
+OpenDocument="lv_tlsf.c", FilePath="/home/hanzhijian/workspace/stm32/lvgl/src/stdlib/builtin/lv_tlsf.c", Line=360
+OpenDocument="lv_obj_style.c", FilePath="/home/hanzhijian/workspace/stm32/lvgl/src/core/lv_obj_style.c", Line=683
+OpenDocument="lv_draw.c", FilePath="/home/hanzhijian/workspace/stm32/lvgl/src/draw/lv_draw.c", Line=239
+OpenDocument="lv_draw_rect.c", FilePath="/home/hanzhijian/workspace/stm32/lvgl/src/draw/lv_draw_rect.c", Line=250
+OpenDocument="", FilePath="", Line=0
+OpenDocument="tasks.c", FilePath="/home/hanzhijian/workspace/stm32/FreeRTOS/tasks.c", Line=6073
+OpenDocument="lv_obj.c", FilePath="/home/hanzhijian/workspace/stm32/lvgl/src/core/lv_obj.c", Line=969
 OpenDocument="stm32f4xx_usart.c", FilePath="/home/hanzhijian/workspace/stm32/STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.c", Line=1274
-OpenDocument="lv_draw_dma2d.h", FilePath="/home/hanzhijian/workspace/stm32/lvgl/src/draw/dma2d/lv_draw_dma2d.h", Line=0
+OpenDocument="", FilePath="", Line=0
 OpenDocument="STM32.jdebug", FilePath="Y:/home/hanzhijian/workspace/stm32/build/STM32.jdebug", Line=60
-OpenDocument="main.c", FilePath="/home/hanzhijian/workspace/stm32/Application/main.c", Line=616
+OpenDocument="main.c", FilePath="/home/hanzhijian/workspace/stm32/Application/main.c", Line=628
 OpenToolbar="Debug", Floating=0, x=0, y=0
-OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=1, w=1275, h=570, TabPos=1, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=1, w=1275, h=570, TabPos=2, TopOfStack=1, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
-OpenWindow="Source Files", DockArea=LEFT, x=0, y=0, w=767, h=1643, TabPos=0, TopOfStack=1, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=1275, h=1072, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Memory 1", DockArea=BOTTOM, x=1, y=0, w=1926, h=319, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, EditorAddress=0x0
-OpenWindow="Local Data", DockArea=RIGHT, x=0, y=1, w=1275, h=570, TabPos=0, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Functions", DockArea=LEFT, x=0, y=0, w=767, h=1643, TabPos=1, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1913, h=319, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=1, w=1275, h=587, TabPos=2, TopOfStack=1, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=1, w=1275, h=587, TabPos=3, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=0, w=514, h=1640, TabPos=0, TopOfStack=1, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=1275, h=1052, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Break & Tracepoints", DockArea=BOTTOM, x=0, y=0, w=1913, h=303, TabPos=0, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VectorCatchIndexMask=254
+OpenWindow="Memory 1", DockArea=BOTTOM, x=1, y=0, w=1926, h=322, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, EditorAddress=0x0
+OpenWindow="Global Data", DockArea=RIGHT, x=0, y=1, w=1275, h=587, TabPos=0, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Local Data", DockArea=RIGHT, x=0, y=1, w=1275, h=587, TabPos=1, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Functions", DockArea=LEFT, x=0, y=0, w=514, h=1640, TabPos=1, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1913, h=303, TabPos=1, TopOfStack=1, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+TableHeader="Global Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[259;100;102;100;100;588]
+TableHeader="Local Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[205;100;102;100;261;507]
 TableHeader="Call Stack", SortCol="Function", SortOrder="ASCENDING", VisibleCols=["Function";"Stack Frame";"Source";"PC";"Return Address";"Stack Used"], ColWidths=[191;154;110;104;234;482]
-TableHeader="Local Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[100;100;102;100;100;773]
+TableHeader="Vector Catches", SortCol="None", SortOrder="ASCENDING", VisibleCols=["";"Vector Catch";"Description"], ColWidths=[50;300;2140]
+TableHeader="Break & Tracepoints", SortCol="None", SortOrder="ASCENDING", VisibleCols=["";"Type";"Location";"Extras"], ColWidths=[100;100;100;2076]
+TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[218;144;887]
 TableHeader="Functions", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Address";"Size";"#Insts";"Source"], ColWidths=[922;104;100;100;100]
 TableHeader="Power Sampling", SortCol="Index", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
 TableHeader="RegisterSelectionDialog", SortCol="None", SortOrder="ASCENDING", VisibleCols=[], ColWidths=[]
 TableHeader="Source Files", SortCol="File", SortOrder="ASCENDING", VisibleCols=["File";"Status";"Size";"#Insts";"Path"], ColWidths=[183;100;100;100;1326]
-TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[218;144;887]
-TableHeader="TargetExceptionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Address";"Description"], ColWidths=[240;139;100;930]
+TableHeader="TargetExceptionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Address";"Description"], ColWidths=[240;139;100;941]

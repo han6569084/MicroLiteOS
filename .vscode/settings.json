@@ -44,7 +44,8 @@
         "semphr.h": "c",
         "usart.h": "c",
         "stdio.h": "c",
-        "freertos.h": "c"
+        "freertos.h": "c",
+        "cstdint": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }

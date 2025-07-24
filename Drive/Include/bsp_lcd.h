@@ -86,6 +86,7 @@ extern const LCD_PARAM_TypeDef lcd_param[];
 #define GPIO_AF_LTDC_AF9          ((uint8_t)0x09)
 
 
+#define USE_TIM2_PWM_BACKLIGHT 0
 /**
   * @}
   */
@@ -265,14 +266,25 @@ extern const LCD_PARAM_TypeDef lcd_param[];
 #define LTDC_DISP_GPIO_CLK         RCC_AHB1Periph_GPIOD
 #define LTDC_DISP_GPIO_PIN         GPIO_Pin_4
 
+
+#if USE_TIM2_PWM_BACKLIGHT
+// 背光PWM输出引脚：PB3 (TIM2_CH2)
+#define LTDC_BL_GPIO_PORT         GPIOB
+#define LTDC_BL_GPIO_CLK          RCC_AHB1Periph_GPIOB
+#define LTDC_BL_GPIO_PIN          GPIO_Pin_3
+#define LTDC_BL_PINSOURCE         GPIO_PinSource3
+#else
+// 背光控制引脚：PD7
 #define LTDC_BL_GPIO_PORT         GPIOD
 #define LTDC_BL_GPIO_CLK          RCC_AHB1Periph_GPIOD
 #define LTDC_BL_GPIO_PIN          GPIO_Pin_7
+#define LTDC_BL_PINSOURCE         GPIO_PinSource7
+#endif
 
 void LCD_Init(uint32_t fb_addr, int lcd_clk_mhz, uint32_t pixel_format );
 void LCD_BackLed_Control ( int on );
 void LCD_LayerCamInit(uint32_t Addr, uint32_t width, uint32_t high);
-
+void LCD_SetBacklight(uint8_t percent);
   /**
   * @}
   */

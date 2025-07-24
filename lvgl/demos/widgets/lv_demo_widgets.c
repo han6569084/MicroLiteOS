@@ -259,6 +259,7 @@ static lv_obj_t *call_label = NULL;
 static lv_obj_t *email_label = NULL;
 static void call_label_timer_cb(lv_timer_t *timer)
 {
+    printf("call_label_timer_cb\n");
     // extern float g_temp;
     // extern float g_humid;
     // char buf[32] = {0};
@@ -266,8 +267,10 @@ static void call_label_timer_cb(lv_timer_t *timer)
     // lv_label_set_text(call_label, buf);
     // snprintf(buf, sizeof(buf), "%2.2f", g_humid);
     // lv_label_set_text(email_label, buf);
-    extern int g_posx;
-    extern int g_posy;
+    static int g_posx = 0;
+    static int g_posy = 0;
+    g_posx += 10;
+    g_posy += 20;
     char buf[32] = {0};
     snprintf(buf, sizeof(buf), "Touch at (%d, %d)", g_posx, g_posy);
     lv_label_set_text(call_label, buf);
@@ -310,7 +313,7 @@ static void profile_create(lv_obj_t * parent)
     call_label = lv_label_create(panel1);
     lv_label_set_text_static(call_label, "+79 246 123 4567");
 
-    lv_timer_create(call_label_timer_cb, 1000, NULL);
+    lv_timer_create(call_label_timer_cb, 100, NULL);
 
     lv_obj_t * log_out_btn = lv_button_create(panel1);
     lv_obj_set_height(log_out_btn, LV_SIZE_CONTENT);

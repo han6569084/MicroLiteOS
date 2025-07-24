@@ -65,9 +65,14 @@ void NMI_Handler(void)
   */
 void MemManage_Handler(void)
 {
-  /* Go to infinite loop when Memory Manage exception occurs */
-  while (1)
-  {}
+    /* Adapt for cm_backtrace: call fault handler with stack pointer */
+    __asm volatile (
+        "TST lr, #4            \n"
+        "ITE EQ                \n"
+        "MRSEQ r0, MSP         \n"
+        "MRSNE r0, PSP         \n"
+        "B cm_backtrace_fault \n"
+    );
 }
 
 /**
@@ -77,9 +82,14 @@ void MemManage_Handler(void)
   */
 void BusFault_Handler(void)
 {
-  /* Go to infinite loop when Bus Fault exception occurs */
-  while (1)
-  {}
+    /* Adapt for cm_backtrace: call fault handler with stack pointer */
+    __asm volatile (
+        "TST lr, #4            \n"
+        "ITE EQ                \n"
+        "MRSEQ r0, MSP         \n"
+        "MRSNE r0, PSP         \n"
+        "B cm_backtrace_fault \n"
+    );
 }
 
 /**
@@ -89,9 +99,14 @@ void BusFault_Handler(void)
   */
 void UsageFault_Handler(void)
 {
-  /* Go to infinite loop when Usage Fault exception occurs */
-  while (1)
-  {}
+    /* Adapt for cm_backtrace: call fault handler with stack pointer */
+    __asm volatile (
+        "TST lr, #4            \n"
+        "ITE EQ                \n"
+        "MRSEQ r0, MSP         \n"
+        "MRSNE r0, PSP         \n"
+        "B cm_backtrace_fault \n"
+    );
 }
 
 /**
