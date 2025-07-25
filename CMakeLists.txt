@@ -8,6 +8,7 @@ set(COMMON_C_FLAGS ${CPU_FLAGS} -Wall -O0 -g -fdiagnostics-color=always -Wextra 
 set(COMMON_DEFINES STM32F429_439xx USE_STDPERIPH_DRIVER __FPU_PRESENT=1 ARM_MATH_CM4)
 set(COMMON_INCLUDES
     ${CMAKE_SOURCE_DIR}/Application
+    ${CMAKE_SOURCE_DIR}/ui
     ${CMAKE_SOURCE_DIR}/Drive/Include
     ${CMAKE_SOURCE_DIR}/FreeRTOS/include
     ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM4F
@@ -97,6 +98,10 @@ file(GLOB_RECURSE DRIVER_SRC
     "Drive/Source/*.c"
 )
 
+file(GLOB_RECURSE UI_SRC
+    "ui/*.c"
+)
+
 # 标准外设库
 file(GLOB_RECURSE STD_PERIPH_SRC
     "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.c"
@@ -118,6 +123,7 @@ file(GLOB_RECURSE STD_PERIPH_SRC
 set(SOURCES
     ${STARTUP}
     ${APP_SRC}
+    ${UI_SRC}
     ${COMPONENTS_SRC}
     ${DRIVER_SRC}
     ${STD_PERIPH_SRC}
