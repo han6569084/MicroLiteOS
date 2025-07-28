@@ -2,10 +2,25 @@ cmake_minimum_required(VERSION 3.15)
 
 project(STM32F429_Project C ASM)
 
+# 添加选项控制内存控制器类型
+option(USE_FMC "Use FMC instead of FSMC for memory controller" ON)
+
 # 公共变量
 set(CPU_FLAGS -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
 set(COMMON_C_FLAGS ${CPU_FLAGS} -Wall -O0 -g -fdiagnostics-color=always -Wextra -Wno-conversion -Wno-unused-parameter -std=c11)
+
+# 基础宏定义
 set(COMMON_DEFINES STM32F429_439xx USE_STDPERIPH_DRIVER __FPU_PRESENT=1 ARM_MATH_CM4)
+
+# 根据选项添加内存控制器宏定义
+if(USE_FMC)
+    list(APPEND COMMON_DEFINES USE_FMC)
+    message(STATUS "Memory Controller: FMC (Flexible Memory Controller)")
+else()
+    list(APPEND COMMON_DEFINES USE_FSMC)
+    message(STATUS "Memory Controller: FSMC (Flexible Static Memory Controller)")
+endif()
+
 set(COMMON_INCLUDES
     ${CMAKE_SOURCE_DIR}/Application
     ${CMAKE_SOURCE_DIR}/ui
@@ -104,19 +119,19 @@ file(GLOB_RECURSE UI_SRC
 
 # 标准外设库
 file(GLOB_RECURSE STD_PERIPH_SRC
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dma.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_exti.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_i2c.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_fmc.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_ltdc.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_syscfg.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dma2d.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_tim.c"
-    "STM32/STM32F4xx_StdPeriph_Driver/src/misc.c"
+    "STM32/STM32F4xx_StdPeriph_Driver/src/*.c"
 )
+
+# 根据内存控制器选项选择性移除相应源文件
+if(USE_FMC)
+    # 使用FMC，移除FSMC源文件
+    list(FILTER STD_PERIPH_SRC EXCLUDE REGEX ".*stm32f4xx_fsmc\\.c$")
+    message(STATUS "Excluded stm32f4xx_fsmc.c (using FMC)")
+else()
+    # 使用FSMC，移除FMC源文件
+    list(FILTER STD_PERIPH_SRC EXCLUDE REGEX ".*stm32f4xx_fmc\\.c$")
+    message(STATUS "Excluded stm32f4xx_fmc.c (using FSMC)")
+endif()
 
 
 # 所有源文件
