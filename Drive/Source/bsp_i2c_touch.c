@@ -11,13 +11,6 @@
 /* HAL库全局变量 */
 I2C_HandleTypeDef hi2c_touch;
 
-static void HAL_Delay_Us(uint32_t us)
-{
-    uint32_t ticks = us * (SystemCoreClock / 1000000);
-    uint32_t start = DWT->CYCCNT;
-    while ((DWT->CYCCNT - start) < ticks);
-}
-
 /**
   * @brief  使能触摸屏中断
   * @param  无
