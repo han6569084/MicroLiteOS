@@ -10,7 +10,7 @@ set(CPU_FLAGS -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
 set(COMMON_C_FLAGS ${CPU_FLAGS} -Wall -O0 -g -fdiagnostics-color=always -Wextra -Wno-conversion -Wno-unused-parameter -std=c11)
 
 # 基础宏定义
-set(COMMON_DEFINES STM32F429_439xx USE_STDPERIPH_DRIVER __FPU_PRESENT=1 ARM_MATH_CM4)
+set(COMMON_DEFINES STM32F429xx USE_HAL_DRIVER ARM_MATH_CM4)
 
 # 根据选项添加内存控制器宏定义
 if(USE_FMC)
@@ -28,10 +28,10 @@ set(COMMON_INCLUDES
     ${CMAKE_SOURCE_DIR}/FreeRTOS/include
     ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM4F
     ${CMAKE_SOURCE_DIR}/CMSIS_5-develop/CMSIS/Core/Include
-    ${CMAKE_SOURCE_DIR}/STM32/CMSIS/Device/ST/STM32F4xx/Include
-    ${CMAKE_SOURCE_DIR}/STM32/STM32F4xx_StdPeriph_Driver/inc
+    ${CMAKE_SOURCE_DIR}/CMSIS_5-develop/Device/ST/STM32F4xx/Include
     ${CMAKE_SOURCE_DIR}/CMSIS_5-develop/CMSIS/RTOS2/Include
     ${CMAKE_SOURCE_DIR}/CMSIS-FreeRTOS-main/CMSIS/RTOS2/FreeRTOS/Include
+    ${CMAKE_SOURCE_DIR}/STM32/STM32F4xx_HAL_Driver/Inc
 )
 
 set(FREERTOS_KERNEL_PATH "FreeRTOS")
@@ -40,8 +40,8 @@ add_library(freertos_config INTERFACE)
 target_include_directories(freertos_config
     INTERFACE
     "Application"
-    STM32/CMSIS/Device/ST/STM32F4xx/Include
-    STM32/STM32F4xx_StdPeriph_Driver/inc
+    CMSIS_5-develop/Device/ST/STM32F4xx/Include
+    STM32/STM32F4xx_HAL_Driver/Inc
     CMSIS_5-develop/CMSIS/Core/Include
     CMSIS_5-develop/CMSIS/RTOS2/Include
     CMSIS-FreeRTOS-main/CMSIS/RTOS2/FreeRTOS/Include
@@ -117,22 +117,20 @@ file(GLOB_RECURSE UI_SRC
     "ui/*.c"
 )
 
-# 标准外设库
-file(GLOB_RECURSE STD_PERIPH_SRC
-    "STM32/STM32F4xx_StdPeriph_Driver/src/*.c"
+# HAL库源文件
+file(GLOB_RECURSE HAL_SRC
+    "STM32/STM32F4xx_HAL_Driver/Src/*.c"
 )
 
-# 根据内存控制器选项选择性移除相应源文件
-if(USE_FMC)
-    # 使用FMC，移除FSMC源文件
-    list(FILTER STD_PERIPH_SRC EXCLUDE REGEX ".*stm32f4xx_fsmc\\.c$")
-    message(STATUS "Excluded stm32f4xx_fsmc.c (using FMC)")
-else()
-    # 使用FSMC，移除FMC源文件
-    list(FILTER STD_PERIPH_SRC EXCLUDE REGEX ".*stm32f4xx_fmc\\.c$")
-    message(STATUS "Excluded stm32f4xx_fmc.c (using FSMC)")
-endif()
+# 移除不需要的HAL库文件（模板文件等）
+list(FILTER HAL_SRC EXCLUDE REGEX ".*_template\\.c$")
 
+# 根据内存控制器选项选择性配置HAL库
+if(USE_FMC)
+    message(STATUS "Memory Controller: FMC (Flexible Memory Controller)")
+else()
+    message(STATUS "Memory Controller: FSMC (Flexible Static Memory Controller)")
+endif()
 
 # 所有源文件
 set(SOURCES
@@ -141,7 +139,7 @@ set(SOURCES
     ${UI_SRC}
     ${COMPONENTS_SRC}
     ${DRIVER_SRC}
-    ${STD_PERIPH_SRC}
+    ${HAL_SRC}
 )
 
 # 添加 CMSIS-RTOS2 适配层源码

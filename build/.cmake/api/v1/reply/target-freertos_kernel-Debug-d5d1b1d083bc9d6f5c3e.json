@@ -1,0 +1,324 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "FreeRTOS-Kernel/libfreertos_kernel.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"target_link_libraries",
+			"target_compile_options",
+			"target_compile_definitions",
+			"target_include_directories",
+			"target_sources"
+		],
+		"files" : 
+		[
+			"FreeRTOS/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 235,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 260,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 53,
+				"parent" : 3
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 52,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 54,
+				"parent" : 3
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 241,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 253,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-mcpu=cortex-m4"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-mthumb"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-mfpu=fpv4-sp-d16"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-mfloat-abi=hard"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-Wall"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-O0"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-g"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-fdiagnostics-color=always"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-Wextra"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-Wno-conversion"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-Wno-unused-parameter"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-std=c11"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 5,
+					"define" : "ARM_MATH_CM4"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "STM32F4"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "STM32F429_439xx"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "STM32F429xx"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "USE_FMC"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "USE_STDPERIPH_DRIVER"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "__FPU_PRESENT=1"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/Application"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/ui"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/Drive/Include"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/FreeRTOS/include"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/FreeRTOS/portable/GCC/ARM_CM4F"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/CMSIS_5-develop/CMSIS/Core/Include"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/CMSIS_5-develop/Device/ST/STM32F4xx/Include"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/STM32/STM32F4xx_StdPeriph_Driver/inc"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/CMSIS_5-develop/CMSIS/RTOS2/Include"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/CMSIS-FreeRTOS-main/CMSIS/RTOS2/FreeRTOS/Include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/home/hanzj/workspace/MicroLiteOS-master/FreeRTOS/include/."
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "freertos_kernel_port::@3b750e658ec9e84f3050"
+		}
+	],
+	"id" : "freertos_kernel::@8d1fe2b5824bfeb7a79b",
+	"name" : "freertos_kernel",
+	"nameOnDisk" : "libfreertos_kernel.a",
+	"paths" : 
+	{
+		"build" : "FreeRTOS-Kernel",
+		"source" : "FreeRTOS"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7
+			]
+		},
+		{
+			"name" : "Object Libraries",
+			"sourceIndexes" : 
+			[
+				8
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 7,
+			"compileGroupIndex" : 0,
+			"path" : "FreeRTOS/croutine.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 7,
+			"compileGroupIndex" : 0,
+			"path" : "FreeRTOS/event_groups.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 7,
+			"compileGroupIndex" : 0,
+			"path" : "FreeRTOS/list.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 7,
+			"compileGroupIndex" : 0,
+			"path" : "FreeRTOS/queue.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 7,
+			"compileGroupIndex" : 0,
+			"path" : "FreeRTOS/stream_buffer.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 7,
+			"compileGroupIndex" : 0,
+			"path" : "FreeRTOS/tasks.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 7,
+			"compileGroupIndex" : 0,
+			"path" : "FreeRTOS/timers.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 8,
+			"compileGroupIndex" : 0,
+			"path" : "FreeRTOS/portable/MemMang/heap_4.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"isGenerated" : true,
+			"path" : "build/FreeRTOS-Kernel/portable/CMakeFiles/freertos_kernel_port.dir/GCC/ARM_CM4F/port.c.o",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

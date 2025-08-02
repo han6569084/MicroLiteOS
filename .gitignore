@@ -1,5 +1,9 @@
 # Ignore build output directories
 build/out/
+build/CMakeFiles/
+build/Makefile
+build/lvgl
+build/FreeRTOS-Kernel
 
 # Ignore object files
 *.obj

@@ -26,7 +26,7 @@ static void lvgl_tick_handler(void * arg)
 
 void ui_app_init(void)
 {
-    LCD_Init(LCD_BUFFER, 0, LTDC_Pixelformat_RGB565);
+    LCD_Init(LCD_BUFFER, 0, LTDC_PIXEL_FORMAT_RGB565);
     GTP_Init_Panel();
     LCD_BackLed_Control(ENABLE);
     lv_init();
@@ -86,7 +86,7 @@ static void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * c
 
 static void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data)
 {
-    volatile int x = 0, y = 0;
+    int x = 0, y = 0;
     GTP_Execu(&x, &y);
     if (x > 0 && y > 0) {
         data->point.x = x;

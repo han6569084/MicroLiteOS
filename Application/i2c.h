@@ -5,29 +5,24 @@ Purpose :
 #ifndef __I2C_H__
 #define __I2C_H__
 /****************************** Includes *****************************/
-#include "stm32f4xx.h"
+#include "stm32f4xx_hal.h"
 /****************************** Defines *******************************/
 
-#define I2C_SPEED                 400000
-#define I2C_OWN_ADDRESS           0x00
+#define SENSORS_I2C_SPEED             400000
+#define I2C_OWN_ADDRESS               0x00
 
 #define I2Cx_FLAG_TIMEOUT             ((uint32_t) 900) //0x1100
 #define I2Cx_LONG_TIMEOUT             ((uint32_t) (300 * I2Cx_FLAG_TIMEOUT)) //was300
 
 #define SENSORS_I2C_SCL_GPIO_PORT         GPIOB
-#define SENSORS_I2C_SCL_GPIO_CLK          RCC_AHB1Periph_GPIOB
-#define SENSORS_I2C_SCL_GPIO_PIN          GPIO_Pin_6
-#define SENSORS_I2C_SCL_GPIO_PINSOURCE    GPIO_PinSource6
+#define SENSORS_I2C_SCL_GPIO_PIN          GPIO_PIN_6
 
 #define SENSORS_I2C_SDA_GPIO_PORT         GPIOB
-#define SENSORS_I2C_SDA_GPIO_CLK          RCC_AHB1Periph_GPIOB
-#define SENSORS_I2C_SDA_GPIO_PIN          GPIO_Pin_7
-#define SENSORS_I2C_SDA_GPIO_PINSOURCE    GPIO_PinSource7
+#define SENSORS_I2C_SDA_GPIO_PIN          GPIO_PIN_7
 
-#define SENSORS_I2C_AF                    GPIO_AF_I2C1
+#define SENSORS_I2C_AF                    GPIO_AF4_I2C1
 
 #define SENSORS_I2C              					 I2C1
-#define SENSORS_I2C_RCC_CLK               RCC_APB1Periph_I2C1
 
 
 #define I2C_DEBUG_ON         1

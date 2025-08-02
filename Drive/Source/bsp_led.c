@@ -29,36 +29,31 @@ void LED_GPIO_Config(void)
     /* Create a GPIO_InitTypeDef structure */
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    /* Enable the GPIO clock for the LEDs */
-    RCC_AHB1PeriphClockCmd(LED1_GPIO_CLK |
-                           LED2_GPIO_CLK |
-                           LED3_GPIO_CLK, ENABLE);
+    /* Enable the GPIO clock for the LEDs - HAL library manages clocks automatically */
+    __HAL_RCC_GPIOH_CLK_ENABLE();
 
     /* Select the GPIO pin to configure */
-    GPIO_InitStructure.GPIO_Pin = LED1_PIN;
+    GPIO_InitStructure.Pin = LED1_PIN;
 
-    /* Set the mode to output */
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-
-    /* Set output type to push-pull */
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    /* Set the mode to output push-pull */
+    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
 
     /* Set pull-up mode */
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.Pull = GPIO_PULLUP;
 
-    /* Set speed to 2MHz */
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    /* Set speed to low */
+    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_LOW;
 
     /* Initialize GPIO for LED1 */
-    GPIO_Init(LED1_GPIO_PORT, &GPIO_InitStructure);
+    HAL_GPIO_Init(LED1_GPIO_PORT, &GPIO_InitStructure);
 
     /* Initialize GPIO for LED2 */
-    GPIO_InitStructure.GPIO_Pin = LED2_PIN;
-    GPIO_Init(LED2_GPIO_PORT, &GPIO_InitStructure);
+    GPIO_InitStructure.Pin = LED2_PIN;
+    HAL_GPIO_Init(LED2_GPIO_PORT, &GPIO_InitStructure);
 
     /* Initialize GPIO for LED3 */
-    GPIO_InitStructure.GPIO_Pin = LED3_PIN;
-    GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStructure);
+    GPIO_InitStructure.Pin = LED3_PIN;
+    HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStructure);
 
     /* Turn off all RGB LEDs */
     LED_RGBOFF;
@@ -67,20 +62,23 @@ void LED_GPIO_Config(void)
 void KEY_GPIO_Config(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+
+    /* Enable GPIOC clock */
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+
     /* Select the GPIO pin to configure */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
+    GPIO_InitStructure.Pin = GPIO_PIN_13;
 
     /* Set the mode to input */
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
 
     /* Set no pull-up or pull-down */
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.Pull = GPIO_NOPULL;
 
-    /* Set speed to 2MHz */
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+    /* Set speed to low */
+    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_LOW;
 
-    /* Initialize GPIO for KEY (should be GPIOC, not LED1_GPIO_PORT) */
-    GPIO_Init(GPIOC, &GPIO_InitStructure);
+    /* Initialize GPIO for KEY */
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
 /*********************************************END OF FILE**********************/

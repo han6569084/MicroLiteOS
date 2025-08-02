@@ -1,4 +1,4 @@
-#include "stm32f4xx.h"
+#include "stm32f4xx_hal.h"
 #include "bsp_led.h"
 #include "i2c.h"
 #include "bsp_mpu_exti.h"
@@ -12,7 +12,6 @@
 #include "bsp_sdram.h"
 #include "bsp_lcd.h"
 #include <string.h>
-#include "misc.h"
 #include "cm_backtrace.h"
 #include "ui_app.h"
 
@@ -112,14 +111,17 @@ volatile uint64_t s_timeLeft = 0;
 
 void EXTI_Config()
 {
-    EXTI_InitTypeDef EXTI_InitStruct;
-    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
-    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-    EXTI_InitStruct.EXTI_Line = EXTI_Line13;
-    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOC, EXTI_PinSource13);
-    EXTI_Init(&EXTI_InitStruct);
+    GPIO_InitTypeDef GPIO_InitStruct;
+
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+
+    GPIO_InitStruct.Pin = GPIO_PIN_13;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 
@@ -242,7 +244,7 @@ int main( void )
     // MPU_Config();
     cm_backtrace_init("STM32F429_Project", "v1.0.0", "v1.0.0");
 
-    printf("DMA2D_IRQn = %d, IP = %d\r\n", DMA2D_IRQn, NVIC_GetPriority(DMA2D_IRQn));
+    printf("DMA2D_IRQn = %d, IP = %ld\r\n", DMA2D_IRQn, NVIC_GetPriority(DMA2D_IRQn));
     ( void ) printf( "sysCoreTask FreeRTOS Project\r\n" );
     printf("SystemCoreClock = %lu\r\n", SystemCoreClock);
 
